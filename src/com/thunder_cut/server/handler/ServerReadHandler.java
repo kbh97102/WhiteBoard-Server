@@ -3,9 +3,9 @@
  * Author : Arakene
  * Created Date : 2020-01-15
  */
-package com.server.handler;
+package com.thunder_cut.server.handler;
 
-import com.server.Attachment;
+import com.thunder_cut.server.Attachment;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
