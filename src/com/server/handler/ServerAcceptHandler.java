@@ -14,6 +14,7 @@ import java.nio.channels.CompletionHandler;
 public class ServerAcceptHandler {
 
     private CompletionHandler<AsynchronousSocketChannel, Attachment> acceptHandler;
+
     public ServerAcceptHandler(){
         acceptHandler = new CompletionHandler<AsynchronousSocketChannel, Attachment>() {
             @Override

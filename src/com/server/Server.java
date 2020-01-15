@@ -6,6 +6,7 @@
 package com.server;
 
 import com.server.handler.ServerAcceptHandler;
+import com.server.handler.ServerReadHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -34,5 +35,14 @@ public class Server {
         ServerInfo.setServer(serverSocket);
         ServerInfo.setClients(clientGroup);
         serverSocket.accept(ServerInfo, new ServerAcceptHandler().getHandler());
+    }
+
+    public void readFromClient(){
+        for(Attachment clientInfo : clientGroup){
+            if(!clientInfo.isReadMode()){
+                clientInfo.setReadMode(true);
+                clientInfo.getClient().read(clientInfo.getBuffer(),clientInfo, new ServerReadHandler().getReadHandler());
+            }
+        }
     }
 }
