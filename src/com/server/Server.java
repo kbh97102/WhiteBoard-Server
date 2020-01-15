@@ -10,7 +10,10 @@ import com.server.handler.ServerReadHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
 public class Server {
@@ -43,6 +46,14 @@ public class Server {
                 clientInfo.setReadMode(true);
                 clientInfo.getClient().read(clientInfo.getBuffer(),clientInfo, new ServerReadHandler().getReadHandler());
             }
+        }
+    }
+
+    public void writeToAllClients(String message){
+        Charset charset = StandardCharsets.UTF_8;
+        ByteBuffer buffer = charset.encode(message);
+        for(Attachment clientInfo : clientGroup){
+            clientInfo.getClient().write(buffer);
         }
     }
 }
