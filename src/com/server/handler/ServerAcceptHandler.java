@@ -15,7 +15,7 @@ public class ServerAcceptHandler {
 
     private CompletionHandler<AsynchronousSocketChannel, Attachment> acceptHandler;
 
-    public ServerAcceptHandler(){
+    public ServerAcceptHandler(Runnable readHandler){
         acceptHandler = new CompletionHandler<AsynchronousSocketChannel, Attachment>() {
             @Override
             public void completed(AsynchronousSocketChannel result, Attachment attachment) {
@@ -26,6 +26,8 @@ public class ServerAcceptHandler {
                 clientInfo.setReadMode(false);
 
                 attachment.getClients().add(clientInfo);
+
+                readHandler.run();
 
                 attachment.getServer().accept(attachment,this);
             }

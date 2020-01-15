@@ -40,7 +40,7 @@ public class Server {
         Attachment ServerInfo = new Attachment();
         ServerInfo.setServer(serverSocket);
         ServerInfo.setClients(clientGroup);
-        serverSocket.accept(ServerInfo, new ServerAcceptHandler().getHandler());
+        serverSocket.accept(ServerInfo, new ServerAcceptHandler(this::readFromClient).getHandler());
     }
 
     public void readFromClient(){
