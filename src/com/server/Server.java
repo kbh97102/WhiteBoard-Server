@@ -7,6 +7,7 @@ package com.server;
 
 import com.server.handler.ServerAcceptHandler;
 import com.server.handler.ServerReadHandler;
+import com.server.handler.ServerWriteHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,6 +23,8 @@ public class Server {
     private static int PORT = 3000;
     private AsynchronousServerSocketChannel serverSocket;
     private Vector<Attachment> clientGroup = new Vector<>();
+    private Charset charset = StandardCharsets.UTF_8;
+    private ByteBuffer buffer;
 
     public Server() {
 
@@ -50,10 +53,16 @@ public class Server {
     }
 
     public void writeToAllClients(String message){
-        Charset charset = StandardCharsets.UTF_8;
-        ByteBuffer buffer = charset.encode(message);
+        buffer = charset.encode(message);
         for(Attachment clientInfo : clientGroup){
-            clientInfo.getClient().write(buffer);
+            clientInfo.getClient().write(buffer, buffer,new ServerWriteHandler().getWriteHandler());
         }
+        buffer.clear();
+    }
+
+    public void writeToSpecificClient(String message, int clientIndex){
+        buffer = charset.encode(message);
+        clientGroup.get(clientIndex).getClient().write(buffer, buffer, new ServerWriteHandler().getWriteHandler());
+        buffer.clear();
     }
 }
