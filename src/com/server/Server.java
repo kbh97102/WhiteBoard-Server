@@ -39,7 +39,7 @@ public class Server {
     public void startAccept(){
         Attachment ServerInfo = new Attachment();
         ServerInfo.setServer(serverSocket);
-        ServerInfo.setClients(clientGroup);
+        ServerInfo.setClientGroup(clientGroup);
         serverSocket.accept(ServerInfo, new ServerAcceptHandler(this::readFromClient).getHandler());
     }
 

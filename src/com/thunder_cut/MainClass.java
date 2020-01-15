@@ -6,7 +6,6 @@
 
 package com.thunder_cut;
 
-import com.server.Server;
 
 public class MainClass {
     public static void main(String[] args) {

@@ -15,14 +15,14 @@ public class Attachment {
     private AsynchronousSocketChannel client;
     private ByteBuffer buffer;
     private boolean isReadMode;
-    private Vector<Attachment> clients;
+    private Vector<Attachment> clientGroup;
 
-    public Vector<Attachment> getClients() {
-        return clients;
+    public Vector<Attachment> getClientGroup() {
+        return clientGroup;
     }
 
-    public void setClients(Vector<Attachment> clients) {
-        this.clients = clients;
+    public void setClientGroup(Vector<Attachment> clientGroup) {
+        this.clientGroup = clientGroup;
     }
 
     public AsynchronousServerSocketChannel getServer() {

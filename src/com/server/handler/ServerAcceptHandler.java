@@ -7,6 +7,7 @@ package com.server.handler;
 
 import com.server.Attachment;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
@@ -19,13 +20,18 @@ public class ServerAcceptHandler {
         acceptHandler = new CompletionHandler<AsynchronousSocketChannel, Attachment>() {
             @Override
             public void completed(AsynchronousSocketChannel result, Attachment attachment) {
+                try {
+                    System.out.println(result.getRemoteAddress()+" is connected");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Attachment clientInfo = new Attachment();
                 clientInfo.setServer(attachment.getServer());
                 clientInfo.setClient(result);
                 clientInfo.setBuffer(ByteBuffer.allocate(10000000));
                 clientInfo.setReadMode(false);
 
-                attachment.getClients().add(clientInfo);
+                attachment.getClientGroup().add(clientInfo);
 
                 readHandler.run();
 

@@ -5,8 +5,6 @@
  */
 package com.server.handler;
 
-import com.server.Attachment;
-
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 

@@ -40,9 +40,8 @@ public class ServerReadHandler {
     public void readString(Attachment clientInfo){
         ByteBuffer buffer = clientInfo.getBuffer();
         buffer.flip();
-
         try {
-            System.out.println(clientInfo.getClient().getRemoteAddress()+ "is send this -> "+charset.decode(buffer));
+            System.out.println(clientInfo.getClient().getRemoteAddress()+ " is send this -> "+charset.decode(buffer));
         } catch (IOException e) {
             e.printStackTrace();
         }
