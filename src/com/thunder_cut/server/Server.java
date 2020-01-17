@@ -8,6 +8,12 @@ package com.thunder_cut.server;
 import com.thunder_cut.server.handler.ServerAcceptHandler;
 import com.thunder_cut.server.handler.ServerReadHandler;
 import com.thunder_cut.server.handler.ServerWriteHandler;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -112,6 +118,31 @@ public class Server implements Runnable{
     }
 
     /**
+     * Convert Image Data to ByteBuffer and Send all client
+     * @param imageLabel JLabel have a image for sending
+     */
+    public void writeToAllClients(JLabel imageLabel){
+        try {
+            ImageIcon imageIcon = (ImageIcon) imageLabel.getIcon();
+            Image image = imageIcon.getImage();
+            BufferedImage bufferedImage = new BufferedImage(image.getWidth(null),image.getHeight(null),BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = bufferedImage.createGraphics();
+            graphics.drawImage(image,null,null);
+            graphics.dispose();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, "png", output);
+            output.flush();
+            ByteBuffer buffer = ByteBuffer.wrap(output.toByteArray());
+
+            for(Attachment client : clientGroup){
+                client.getClient().write(buffer);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * Pick specific client and send String message
      * @param message String message
      * @param clientIndex Sending Target
@@ -120,6 +151,30 @@ public class Server implements Runnable{
         buffer = charset.encode(message);
         clientGroup.get(clientIndex).getClient().write(buffer, buffer, new ServerWriteHandler().getWriteHandler());
         buffer.clear();
+    }
+
+    /**
+     * Convert Image Data to ByteBuffer and Send specific client
+     * @param imageLabel JLabel have a image for sending
+     * @param clientIndex Receiving target
+     */
+    public void writeToSpecificClient(JLabel imageLabel, int clientIndex){
+        try {
+            ImageIcon imageIcon = (ImageIcon) imageLabel.getIcon();
+            Image image = imageIcon.getImage();
+            BufferedImage bufferedImage = new BufferedImage(image.getWidth(null),image.getHeight(null),BufferedImage.TYPE_INT_RGB);
+            Graphics2D graphics = bufferedImage.createGraphics();
+            graphics.drawImage(image,null,null);
+            graphics.dispose();
+            ByteArrayOutputStream output = new ByteArrayOutputStream();
+            ImageIO.write(bufferedImage, "png", output);
+            output.flush();
+            ByteBuffer buffer = ByteBuffer.wrap(output.toByteArray());
+
+            clientGroup.get(clientIndex).getClient().write(buffer);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
