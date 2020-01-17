@@ -20,6 +20,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 import java.util.Vector;
 
 public class Server implements Runnable{
@@ -179,15 +180,31 @@ public class Server implements Runnable{
 
     /**
      * If you use GUI remove Implement Runnable
+     *
+     * If user input Quit writing will shutdown
      */
     @Override
     public void run() {
         startAccept();
 
+        String input;
+        Scanner scanner = new Scanner(System.in);
+        while(!(input = scanner.nextLine()).equals("Quit")){
+            writeToAllClients(input);
+        }
+
         try {
             Thread.currentThread().join();
         } catch (InterruptedException e) {
             e.printStackTrace();
+        }
+        finally {
+            try {
+                serverSocket.close();
+                scanner.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

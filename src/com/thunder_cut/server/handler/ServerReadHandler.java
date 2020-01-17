@@ -68,7 +68,6 @@ public class ServerReadHandler {
         try{
             ByteBuffer buffer = clientInfo.getBuffer();
             buffer.flip();
-            System.out.println(buffer.toString());
             ByteArrayInputStream input = new ByteArrayInputStream(buffer.array());
             BufferedImage image = ImageIO.read(input);
             ImageIcon icon = new ImageIcon(image);
