@@ -12,7 +12,7 @@ public class ServerWriteHandler {
 
     private CompletionHandler<Integer, ByteBuffer> writeHandler;
 
-    public ServerWriteHandler(){
+    public ServerWriteHandler() {
         writeHandler = new CompletionHandler<Integer, ByteBuffer>() {
             @Override
             public void completed(Integer result, ByteBuffer attachment) {
@@ -26,7 +26,7 @@ public class ServerWriteHandler {
         };
     }
 
-    public CompletionHandler<Integer,ByteBuffer> getWriteHandler(){
+    public CompletionHandler<Integer, ByteBuffer> getWriteHandler() {
         return writeHandler;
     }
 }

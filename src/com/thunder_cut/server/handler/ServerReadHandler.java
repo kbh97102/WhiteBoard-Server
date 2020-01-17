@@ -23,7 +23,7 @@ public class ServerReadHandler {
     private CompletionHandler<Integer, Attachment> readHandler;
     private Charset charset = StandardCharsets.UTF_8;
 
-    public ServerReadHandler(){
+    public ServerReadHandler() {
         readHandler = new CompletionHandler<Integer, Attachment>() {
             /**
              * If read method success completed will start
@@ -44,13 +44,14 @@ public class ServerReadHandler {
 
     /**
      * Decode data and display
+     *
      * @param clientInfo client Information
      */
-    public void readString(Attachment clientInfo){
+    public void readString(Attachment clientInfo) {
         ByteBuffer buffer = clientInfo.getBuffer();
         buffer.flip();
         try {
-            System.out.println(clientInfo.getClient().getRemoteAddress()+ " is send this -> "+charset.decode(buffer));
+            System.out.println(clientInfo.getClient().getRemoteAddress() + " is send this -> " + charset.decode(buffer));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -61,11 +62,12 @@ public class ServerReadHandler {
 
     /**
      * Get ByteBuffer data and transform to ImageIcon
-     * @param clientInfo Client Information
+     *
+     * @param clientInfo           Client Information
      * @param displayImageInJLabel Display in screen use ImageIcon that transformed data
      */
-    public void readImage(Attachment clientInfo,  Consumer<ImageIcon> displayImageInJLabel){
-        try{
+    public void readImage(Attachment clientInfo, Consumer<ImageIcon> displayImageInJLabel) {
+        try {
             ByteBuffer buffer = clientInfo.getBuffer();
             buffer.flip();
             ByteArrayInputStream input = new ByteArrayInputStream(buffer.array());
@@ -77,7 +79,7 @@ public class ServerReadHandler {
         }
     }
 
-    public CompletionHandler<Integer, Attachment> getReadHandler(){
+    public CompletionHandler<Integer, Attachment> getReadHandler() {
         return readHandler;
     }
 }

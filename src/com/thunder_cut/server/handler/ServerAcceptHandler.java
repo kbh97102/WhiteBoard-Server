@@ -17,7 +17,7 @@ public class ServerAcceptHandler {
     private CompletionHandler<AsynchronousSocketChannel, Attachment> acceptHandler;
 
 
-    public ServerAcceptHandler(Runnable readHandler){
+    public ServerAcceptHandler(Runnable readHandler) {
         acceptHandler = new CompletionHandler<AsynchronousSocketChannel, Attachment>() {
             /**
              * If Accept is success completed will be start
@@ -29,7 +29,7 @@ public class ServerAcceptHandler {
             @Override
             public void completed(AsynchronousSocketChannel result, Attachment attachment) {
                 try {
-                    System.out.println(result.getRemoteAddress()+" is connected");
+                    System.out.println(result.getRemoteAddress() + " is connected");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -43,7 +43,7 @@ public class ServerAcceptHandler {
 
                 readHandler.run();
 
-                attachment.getServer().accept(attachment,this);
+                attachment.getServer().accept(attachment, this);
             }
 
             @Override
@@ -53,7 +53,7 @@ public class ServerAcceptHandler {
         };
     }
 
-    public CompletionHandler<AsynchronousSocketChannel, Attachment> getHandler(){
+    public CompletionHandler<AsynchronousSocketChannel, Attachment> getHandler() {
         return acceptHandler;
     }
 
