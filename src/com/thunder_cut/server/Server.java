@@ -20,18 +20,43 @@ import java.util.Vector;
 
 public class Server {
 
-    private static String IP = "127.0.0.1";
-    private static int PORT = 3000;
+    private final static int PORT = 3001;
     private AsynchronousServerSocketChannel serverSocket;
     private Vector<Attachment> clientGroup = new Vector<>();
     private Charset charset = StandardCharsets.UTF_8;
     private ByteBuffer buffer;
 
     public Server() {
-
         try {
             serverSocket = AsynchronousServerSocketChannel.open();
-            serverSocket.bind(new InetSocketAddress(IP, PORT));
+            serverSocket.bind(new InetSocketAddress(PORT));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Server(int port) {
+        try {
+            serverSocket = AsynchronousServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress(port));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Server(String ip) {
+        try {
+            serverSocket = AsynchronousServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress(ip, PORT));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Server(String ip, int port) {
+        try {
+            serverSocket = AsynchronousServerSocketChannel.open();
+            serverSocket.bind(new InetSocketAddress(ip, port));
         } catch (IOException e) {
             e.printStackTrace();
         }
