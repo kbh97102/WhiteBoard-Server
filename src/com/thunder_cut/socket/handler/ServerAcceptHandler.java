@@ -3,9 +3,9 @@
  * Author : Arakene
  * Created Date : 2020-01-15
  */
-package com.thunder_cut.server.handler;
+package com.thunder_cut.socket.handler;
 
-import com.thunder_cut.server.Attachment;
+import com.thunder_cut.socket.Attachment;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;

@@ -3,11 +3,11 @@
  * Author : Arakene
  * Created Date : 2020-01-15
  */
-package com.thunder_cut.server;
+package com.thunder_cut.socket;
 
-import com.thunder_cut.server.handler.ServerAcceptHandler;
-import com.thunder_cut.server.handler.ServerReadHandler;
-import com.thunder_cut.server.handler.ServerWriteHandler;
+import com.thunder_cut.socket.handler.ServerAcceptHandler;
+import com.thunder_cut.socket.handler.ServerReadHandler;
+import com.thunder_cut.socket.handler.ServerWriteHandler;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

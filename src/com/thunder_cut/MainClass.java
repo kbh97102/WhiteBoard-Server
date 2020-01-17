@@ -6,7 +6,7 @@
 
 package com.thunder_cut;
 
-import com.thunder_cut.server.Server;
+import com.thunder_cut.socket.Server;
 
 public class MainClass {
     public static void main(String[] args) {
