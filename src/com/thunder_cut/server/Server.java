@@ -18,7 +18,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Vector;
 
-public class Server {
+public class Server implements Runnable{
 
     private final static int PORT = 3001;
     private AsynchronousServerSocketChannel serverSocket;
@@ -90,5 +90,16 @@ public class Server {
         buffer = charset.encode(message);
         clientGroup.get(clientIndex).getClient().write(buffer, buffer, new ServerWriteHandler().getWriteHandler());
         buffer.clear();
+    }
+
+    @Override
+    public void run() {
+        startAccept();
+
+        try {
+            Thread.currentThread().join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }
