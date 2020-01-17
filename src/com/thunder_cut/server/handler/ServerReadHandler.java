@@ -25,6 +25,11 @@ public class ServerReadHandler {
 
     public ServerReadHandler(){
         readHandler = new CompletionHandler<Integer, Attachment>() {
+            /**
+             * If read method success completed will start
+             * @param result Statement
+             * @param attachment Client Information
+             */
             @Override
             public void completed(Integer result, Attachment attachment) {
                 readString(attachment);
@@ -37,6 +42,10 @@ public class ServerReadHandler {
         };
     }
 
+    /**
+     * Decode data and display
+     * @param clientInfo client Information
+     */
     public void readString(Attachment clientInfo){
         ByteBuffer buffer = clientInfo.getBuffer();
         buffer.flip();
@@ -50,8 +59,12 @@ public class ServerReadHandler {
         clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, readHandler);
     }
 
-    public void readImage(Attachment clientInfo){
-        Consumer<ImageIcon> displayImageInJLabel = null;
+    /**
+     * Get ByteBuffer data and transform to ImageIcon
+     * @param clientInfo Client Information
+     * @param displayImageInJLabel Display in screen use ImageIcon that transformed data
+     */
+    public void readImage(Attachment clientInfo,  Consumer<ImageIcon> displayImageInJLabel){
         try{
             ByteBuffer buffer = clientInfo.getBuffer();
             buffer.flip();

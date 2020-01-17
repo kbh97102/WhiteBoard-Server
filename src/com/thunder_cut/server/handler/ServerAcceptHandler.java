@@ -16,8 +16,16 @@ public class ServerAcceptHandler {
 
     private CompletionHandler<AsynchronousSocketChannel, Attachment> acceptHandler;
 
+
     public ServerAcceptHandler(Runnable readHandler){
         acceptHandler = new CompletionHandler<AsynchronousSocketChannel, Attachment>() {
+            /**
+             * If Accept is success completed will be start
+             * Create new ClientInfo , Start reading from this client, and Save ClientGroup
+             * Accept method keep running with this acceptHandler
+             * @param result accepted socket
+             * @param attachment Server Information
+             */
             @Override
             public void completed(AsynchronousSocketChannel result, Attachment attachment) {
                 try {
