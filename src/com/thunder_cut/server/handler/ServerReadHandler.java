@@ -33,7 +33,7 @@ public class ServerReadHandler {
              */
             @Override
             public void completed(Integer result, Attachment attachment) {
-                readString(attachment);
+                selectReadMode(attachment);
             }
 
             @Override
@@ -43,22 +43,27 @@ public class ServerReadHandler {
         };
     }
 
+    /**
+     *  this method will determine data type
+     * In buffer, first data is 's', data type is String
+     * else 'i', data type is Image 
+     * @param attachment Client Information
+     */
     private void selectReadMode(Attachment attachment){
         ByteBuffer buffer = attachment.getBuffer();
         byte[] arr = buffer.array();
         if(arr[0] == (byte)'s'){
             System.arraycopy(arr,1,arr,0,arr.length);
-            attachment.getBuffer().clear();
-            attachment.getBuffer().put(arr);
+            buffer.clear();
+            buffer = ByteBuffer.wrap(arr);
             readString(attachment);
         }
         else{
             System.arraycopy(arr,1,arr,0,arr.length);
-            attachment.getBuffer().clear();
-            attachment.getBuffer().put(arr);
-//            readImage(attachment,);
+            buffer.clear();
+            buffer = ByteBuffer.wrap(arr);
+            readImage(attachment);
         }
-        buffer = ByteBuffer.wrap(arr);
     }
     /**
      * Decode data and display
@@ -95,6 +100,10 @@ public class ServerReadHandler {
         }
     }
 
+    /**
+     * If you want to display image, you must add Consumer before start reading
+     * @param displayImageInJLabel ConsumerType
+     */
     public void addDisplay(Consumer<ImageIcon> displayImageInJLabel){
         this.displayImageInJLabel = displayImageInJLabel;
     }
