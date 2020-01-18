@@ -22,6 +22,7 @@ public class ServerReadHandler {
 
     private CompletionHandler<Integer, Attachment> readHandler;
     private Charset charset = StandardCharsets.UTF_8;
+    private Consumer<ImageIcon> displayImageInJLabel;
 
     public ServerReadHandler() {
         readHandler = new CompletionHandler<Integer, Attachment>() {
@@ -42,6 +43,23 @@ public class ServerReadHandler {
         };
     }
 
+    private void selectReadMode(Attachment attachment){
+        ByteBuffer buffer = attachment.getBuffer();
+        byte[] arr = buffer.array();
+        if(arr[0] == (byte)'s'){
+            System.arraycopy(arr,1,arr,0,arr.length);
+            attachment.getBuffer().clear();
+            attachment.getBuffer().put(arr);
+            readString(attachment);
+        }
+        else{
+            System.arraycopy(arr,1,arr,0,arr.length);
+            attachment.getBuffer().clear();
+            attachment.getBuffer().put(arr);
+//            readImage(attachment,);
+        }
+        buffer = ByteBuffer.wrap(arr);
+    }
     /**
      * Decode data and display
      *
@@ -49,7 +67,6 @@ public class ServerReadHandler {
      */
     public void readString(Attachment clientInfo) {
         ByteBuffer buffer = clientInfo.getBuffer();
-        buffer.flip();
         try {
             System.out.println(clientInfo.getClient().getRemoteAddress() + " is send this -> " + charset.decode(buffer));
         } catch (IOException e) {
@@ -64,9 +81,8 @@ public class ServerReadHandler {
      * Get ByteBuffer data and transform to ImageIcon
      *
      * @param clientInfo           Client Information
-     * @param displayImageInJLabel Display in screen use ImageIcon that transformed data
      */
-    public void readImage(Attachment clientInfo, Consumer<ImageIcon> displayImageInJLabel) {
+    public void readImage(Attachment clientInfo) {
         try {
             ByteBuffer buffer = clientInfo.getBuffer();
             buffer.flip();
@@ -79,6 +95,9 @@ public class ServerReadHandler {
         }
     }
 
+    public void addDisplay(Consumer<ImageIcon> displayImageInJLabel){
+        this.displayImageInJLabel = displayImageInJLabel;
+    }
     public CompletionHandler<Integer, Attachment> getReadHandler() {
         return readHandler;
     }
