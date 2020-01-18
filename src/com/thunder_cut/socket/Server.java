@@ -3,11 +3,11 @@
  * Author : Arakene
  * Created Date : 2020-01-15
  */
-package com.thunder_cut.server;
+package com.thunder_cut.socket;
 
-import com.thunder_cut.server.handler.ServerAcceptHandler;
-import com.thunder_cut.server.handler.ServerReadHandler;
-import com.thunder_cut.server.handler.ServerWriteHandler;
+import com.thunder_cut.socket.handler.ServerAcceptHandler;
+import com.thunder_cut.socket.handler.ServerReadHandler;
+import com.thunder_cut.socket.handler.ServerWriteHandler;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -28,19 +28,14 @@ public class Server implements Runnable {
     private final static int PORT = 3001;
     private AsynchronousServerSocketChannel serverSocket;
     private Vector<Attachment> clientGroup = new Vector<>();
-    private Charset charset = StandardCharsets.UTF_8;
+    private static final Charset charset = StandardCharsets.UTF_8;
     private ByteBuffer buffer;
 
     /**
      * All IP, Default Port
      */
     public Server() {
-        try {
-            serverSocket = AsynchronousServerSocketChannel.open();
-            serverSocket.bind(new InetSocketAddress(PORT));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this(null, PORT);
     }
 
     /**
@@ -49,12 +44,7 @@ public class Server implements Runnable {
      * @param port Custom Port is that user want to connect
      */
     public Server(int port) {
-        try {
-            serverSocket = AsynchronousServerSocketChannel.open();
-            serverSocket.bind(new InetSocketAddress(port));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this(null, port);
     }
 
     /**
@@ -63,12 +53,7 @@ public class Server implements Runnable {
      * @param ip Specific IP is that user want to connect
      */
     public Server(String ip) {
-        try {
-            serverSocket = AsynchronousServerSocketChannel.open();
-            serverSocket.bind(new InetSocketAddress(ip, PORT));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this(ip, PORT);
     }
 
     /**
@@ -78,7 +63,7 @@ public class Server implements Runnable {
     public Server(String ip, int port) {
         try {
             serverSocket = AsynchronousServerSocketChannel.open();
-            serverSocket.bind(new InetSocketAddress(ip, port));
+            serverSocket.bind(ip == null ? new InetSocketAddress(port) : new InetSocketAddress(ip, port));
         } catch (IOException e) {
             e.printStackTrace();
         }

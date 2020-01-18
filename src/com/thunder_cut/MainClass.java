@@ -6,12 +6,21 @@
 
 package com.thunder_cut;
 
-
-import com.thunder_cut.server.Server;
+import com.thunder_cut.socket.Server;
 
 public class MainClass {
     public static void main(String[] args) {
-        Server server = new Server();
+        Server server;
+        if (args.length == 0) {
+            server = new Server();
+        } else if (args.length == 1) {
+            int port = Integer.parseInt(args[0]);
+            server = new Server(port);
+        } else {
+            String ip = args[0];
+            int port = Integer.parseInt(args[1]);
+            server = new Server(ip, port);
+        }
         Thread serverThread = new Thread(server);
         serverThread.start();
     }
