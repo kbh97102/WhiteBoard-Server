@@ -16,6 +16,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.function.Consumer;
 
 public class ServerReadHandler {
@@ -46,20 +47,23 @@ public class ServerReadHandler {
     /**
      *  this method will determine data type
      * In buffer, first data is 's', data type is String
-     * else 'i', data type is Image 
+     * else 'i', data type is Image
      * @param attachment Client Information
      */
     private void selectReadMode(Attachment attachment){
         ByteBuffer buffer = attachment.getBuffer();
+        System.out.println(buffer.toString()+"TEst");
         byte[] arr = buffer.array();
+        buffer.flip();
+
         if(arr[0] == (byte)'s'){
-            System.arraycopy(arr,1,arr,0,arr.length);
+            System.arraycopy(arr,1,arr,0,arr.length-1);
             buffer.clear();
             buffer = ByteBuffer.wrap(arr);
             readString(attachment);
         }
         else{
-            System.arraycopy(arr,1,arr,0,arr.length);
+            System.arraycopy(arr,1,arr,0,arr.length-1);
             buffer.clear();
             buffer = ByteBuffer.wrap(arr);
             readImage(attachment);
