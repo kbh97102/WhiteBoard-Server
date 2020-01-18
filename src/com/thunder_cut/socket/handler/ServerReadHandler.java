@@ -65,6 +65,7 @@ public class ServerReadHandler {
 
     /**
      * Decode data and display
+     * In buffer First data is standard so skip this data and read
      *
      * @param clientInfo client Information
      */
@@ -83,6 +84,7 @@ public class ServerReadHandler {
 
     /**
      * Get ByteBuffer data and transform to ImageIcon
+     * In buffer First data is standard so skip this data and read
      *
      * @param clientInfo Client Information
      */
