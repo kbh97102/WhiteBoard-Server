@@ -10,6 +10,7 @@ import com.thunder_cut.socket.Attachment;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -45,30 +46,23 @@ public class ServerReadHandler {
     }
 
     /**
-     *  this method will determine data type
+     * this method will determine data type
      * In buffer, first data is 's', data type is String
      * else 'i', data type is Image
+     *
      * @param attachment Client Information
      */
-    private void selectReadMode(Attachment attachment){
+    private void selectReadMode(Attachment attachment) {
         ByteBuffer buffer = attachment.getBuffer();
-        System.out.println(buffer.toString()+"TEst");
         byte[] arr = buffer.array();
-        buffer.flip();
 
-        if(arr[0] == (byte)'s'){
-            System.arraycopy(arr,1,arr,0,arr.length-1);
-            buffer.clear();
-            buffer = ByteBuffer.wrap(arr);
+        if (arr[0] == (byte) 's') {
             readString(attachment);
-        }
-        else{
-            System.arraycopy(arr,1,arr,0,arr.length-1);
-            buffer.clear();
-            buffer = ByteBuffer.wrap(arr);
+        } else {
             readImage(attachment);
         }
     }
+
     /**
      * Decode data and display
      *
@@ -76,12 +70,13 @@ public class ServerReadHandler {
      */
     public void readString(Attachment clientInfo) {
         ByteBuffer buffer = clientInfo.getBuffer();
+        buffer.flip();
+        buffer.position(1);
         try {
             System.out.println(clientInfo.getClient().getRemoteAddress() + " is send this -> " + charset.decode(buffer));
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         buffer.clear();
         clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, readHandler);
     }
@@ -89,12 +84,13 @@ public class ServerReadHandler {
     /**
      * Get ByteBuffer data and transform to ImageIcon
      *
-     * @param clientInfo           Client Information
+     * @param clientInfo Client Information
      */
     public void readImage(Attachment clientInfo) {
         try {
             ByteBuffer buffer = clientInfo.getBuffer();
             buffer.flip();
+            buffer.position(1);
             ByteArrayInputStream input = new ByteArrayInputStream(buffer.array());
             BufferedImage image = ImageIO.read(input);
             ImageIcon icon = new ImageIcon(image);
@@ -106,11 +102,13 @@ public class ServerReadHandler {
 
     /**
      * If you want to display image, you must add Consumer before start reading
+     *
      * @param displayImageInJLabel ConsumerType
      */
-    public void addDisplay(Consumer<ImageIcon> displayImageInJLabel){
+    public void addDisplay(Consumer<ImageIcon> displayImageInJLabel) {
         this.displayImageInJLabel = displayImageInJLabel;
     }
+
     public CompletionHandler<Integer, Attachment> getReadHandler() {
         return readHandler;
     }
