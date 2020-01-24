@@ -23,6 +23,9 @@ public class Server implements Runnable {
     private final static int PORT = 3001;
     private AsynchronousServerSocketChannel serverSocket;
     private Vector<Attachment> clientGroup = new Vector<>();
+    private ServerAcceptHandler serverAcceptHandler;
+    private ServerReadHandler serverReadHandler;
+    private ServerWriteHandler serverWriteHandler;
 
     /**
      * All IP, Default Port
@@ -67,10 +70,13 @@ public class Server implements Runnable {
      * and Start reading with ServerReadHandler
      */
     public void startAccept() {
+        serverAcceptHandler = new ServerAcceptHandler(this::readFromClient);
+        serverReadHandler = new ServerReadHandler(this::writeToAllClients);
+        serverWriteHandler = new ServerWriteHandler();
         Attachment ServerInfo = new Attachment();
         ServerInfo.setServer(serverSocket);
         ServerInfo.setClientGroup(clientGroup);
-        serverSocket.accept(ServerInfo, new ServerAcceptHandler(this::readFromClient).getHandler());
+        serverSocket.accept(ServerInfo, serverAcceptHandler.getHandler());
     }
 
     /**
@@ -80,7 +86,7 @@ public class Server implements Runnable {
         for (Attachment clientInfo : clientGroup) {
             if (!clientInfo.isReadMode()) {
                 clientInfo.setReadMode(true);
-                clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, new ServerReadHandler().getReadHandler());
+                clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, serverReadHandler.getReadHandler());
             }
         }
     }
@@ -92,7 +98,7 @@ public class Server implements Runnable {
      */
     public void writeToAllClients(ByteBuffer data) {
         for (Attachment clientInfo : clientGroup) {
-            clientInfo.getClient().write(data, data, new ServerWriteHandler().getWriteHandler());
+            clientInfo.getClient().write(data, data, serverWriteHandler.getWriteHandler());
         }
         data.clear();
     }
