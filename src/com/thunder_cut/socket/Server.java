@@ -70,14 +70,19 @@ public class Server implements Runnable {
      * and Start reading with ServerReadHandler
      */
     public void startAccept() {
-        serverAcceptHandler = new ServerAcceptHandler(this::readFromClient);
-        serverReadHandler = new ServerReadHandler(this::writeToAllClients);
-        serverWriteHandler = new ServerWriteHandler();
+        handlerInitialize();
         Attachment ServerInfo = new Attachment();
         ServerInfo.setServer(serverSocket);
         ServerInfo.setClientGroup(clientGroup);
         serverSocket.accept(ServerInfo, serverAcceptHandler.getHandler());
     }
+
+    public void handlerInitialize(){
+        serverAcceptHandler = new ServerAcceptHandler(this::readFromClient);
+        serverReadHandler = new ServerReadHandler(this::writeToAllClients);
+        serverWriteHandler = new ServerWriteHandler();
+    }
+
 
     /**
      * If Client is not readMode start Reading
