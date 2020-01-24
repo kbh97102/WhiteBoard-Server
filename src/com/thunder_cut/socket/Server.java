@@ -77,7 +77,7 @@ public class Server implements Runnable {
         serverSocket.accept(ServerInfo, serverAcceptHandler.getHandler());
     }
 
-    private void handlerInitialize(){
+    private void handlerInitialize() {
         serverAcceptHandler = new ServerAcceptHandler(this::readFromClient);
         serverReadHandler = new ServerReadHandler(this::writeToAllClients);
         serverWriteHandler = new ServerWriteHandler();
@@ -105,7 +105,6 @@ public class Server implements Runnable {
         for (Attachment clientInfo : clientGroup) {
             clientInfo.getClient().write(data, data, serverWriteHandler.getWriteHandler());
         }
-        data.clear();
     }
 
 
