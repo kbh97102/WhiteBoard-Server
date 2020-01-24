@@ -69,7 +69,7 @@ public class Server implements Runnable {
      * When this method is called Server Will be waiting for connect from client with ServerAcceptHandler
      * and Start reading with ServerReadHandler
      */
-    public void startAccept() {
+    private void startAccept() {
         handlerInitialize();
         Attachment ServerInfo = new Attachment();
         ServerInfo.setServer(serverSocket);
@@ -77,7 +77,7 @@ public class Server implements Runnable {
         serverSocket.accept(ServerInfo, serverAcceptHandler.getHandler());
     }
 
-    public void handlerInitialize(){
+    private void handlerInitialize(){
         serverAcceptHandler = new ServerAcceptHandler(this::readFromClient);
         serverReadHandler = new ServerReadHandler(this::writeToAllClients);
         serverWriteHandler = new ServerWriteHandler();
@@ -87,7 +87,7 @@ public class Server implements Runnable {
     /**
      * If Client is not readMode start Reading
      */
-    public void readFromClient() {
+    private void readFromClient() {
         for (Attachment clientInfo : clientGroup) {
             if (!clientInfo.isReadMode()) {
                 clientInfo.setReadMode(true);
@@ -101,7 +101,7 @@ public class Server implements Runnable {
      *
      * @param data Data
      */
-    public void writeToAllClients(ByteBuffer data) {
+    private void writeToAllClients(ByteBuffer data) {
         for (Attachment clientInfo : clientGroup) {
             clientInfo.getClient().write(data, data, serverWriteHandler.getWriteHandler());
         }
