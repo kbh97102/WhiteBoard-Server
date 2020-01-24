@@ -26,7 +26,7 @@ public class ServerReadHandler {
              */
             @Override
             public void completed(Integer result, Attachment attachment) {
-
+                sendToAllClient.accept(attachment.getBuffer());
             }
 
             @Override
