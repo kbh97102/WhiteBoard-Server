@@ -23,7 +23,6 @@ import java.util.function.Consumer;
 public class ServerReadHandler {
 
     private CompletionHandler<Integer, Attachment> readHandler;
-    private Charset charset = StandardCharsets.UTF_8;
     private Consumer<ImageIcon> displayImageInJLabel;
 
     public ServerReadHandler() {
@@ -35,7 +34,7 @@ public class ServerReadHandler {
              */
             @Override
             public void completed(Integer result, Attachment attachment) {
-                selectReadMode(attachment);
+
             }
 
             @Override
@@ -43,63 +42,6 @@ public class ServerReadHandler {
                 System.out.println("Server Read Error");
             }
         };
-    }
-
-    /**
-     * this method will determine data type
-     * In buffer, first data is 's', data type is String
-     * else 'i', data type is Image
-     *
-     * @param attachment Client Information
-     */
-    private void selectReadMode(Attachment attachment) {
-        ByteBuffer buffer = attachment.getBuffer();
-        byte[] arr = buffer.array();
-
-        if (arr[0] == (byte) 's') {
-            readString(attachment);
-        } else {
-            readImage(attachment);
-        }
-    }
-
-    /**
-     * Decode data and display
-     * In buffer First data is standard so skip this data and read
-     *
-     * @param clientInfo client Information
-     */
-    public void readString(Attachment clientInfo) {
-        ByteBuffer buffer = clientInfo.getBuffer();
-        buffer.flip();
-        buffer.position(1);
-        try {
-            System.out.println(clientInfo.getClient().getRemoteAddress() + " is send this -> " + charset.decode(buffer));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        buffer.clear();
-        clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, readHandler);
-    }
-
-    /**
-     * Get ByteBuffer data and transform to ImageIcon
-     * In buffer First data is standard so skip this data and read
-     *
-     * @param clientInfo Client Information
-     */
-    public void readImage(Attachment clientInfo) {
-        try {
-            ByteBuffer buffer = clientInfo.getBuffer();
-            buffer.flip();
-            buffer.position(1);
-            ByteArrayInputStream input = new ByteArrayInputStream(buffer.array());
-            BufferedImage image = ImageIO.read(input);
-            ImageIcon icon = new ImageIcon(image);
-            displayImageInJLabel.accept(icon);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
