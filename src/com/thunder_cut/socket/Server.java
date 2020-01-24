@@ -23,8 +23,6 @@ public class Server implements Runnable {
     private final static int PORT = 3001;
     private AsynchronousServerSocketChannel serverSocket;
     private Vector<Attachment> clientGroup = new Vector<>();
-    private static final Charset charset = StandardCharsets.UTF_8;
-    private ByteBuffer buffer;
 
     /**
      * All IP, Default Port
@@ -88,16 +86,15 @@ public class Server implements Runnable {
     }
 
     /**
-     * Send String Message to All client in ClientGroup
+     * Send Data to All client in ClientGroup
      *
-     * @param message String Message
+     * @param data Data
      */
-    public void writeToAllClients(String message) {
-        buffer = charset.encode(message);
+    public void writeToAllClients(ByteBuffer data) {
         for (Attachment clientInfo : clientGroup) {
-            clientInfo.getClient().write(buffer, buffer, new ServerWriteHandler().getWriteHandler());
+            clientInfo.getClient().write(data, data, new ServerWriteHandler().getWriteHandler());
         }
-        buffer.clear();
+        data.clear();
     }
 
 
@@ -112,8 +109,11 @@ public class Server implements Runnable {
 
         String input;
         Scanner scanner = new Scanner(System.in);
+        Charset charset = StandardCharsets.UTF_8;
+
         while (!(input = scanner.nextLine()).equals("Quit")) {
-            writeToAllClients(input);
+            ByteBuffer inputBuffer = charset.encode(input);
+            writeToAllClients(inputBuffer);
         }
 
         try {
