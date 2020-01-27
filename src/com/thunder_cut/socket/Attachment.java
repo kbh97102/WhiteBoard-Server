@@ -10,6 +10,15 @@ import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.util.Vector;
 
+/**
+ *  This class have information about connected client
+ *  server = connected server
+ *  client = want to connect to server
+ *  buffer = save data for receive or send
+ *  isReadMode = If read is running true else false
+ *  clientGroup = collection about connected clients
+ */
+
 public class Attachment {
     private AsynchronousServerSocketChannel server;
     private AsynchronousSocketChannel client;

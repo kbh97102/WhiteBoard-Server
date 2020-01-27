@@ -12,6 +12,13 @@ import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousSocketChannel;
 import java.nio.channels.CompletionHandler;
 
+/**
+ * This class will work After accept method
+ * Create new Client Information with connected client and Read until program shutdown
+ * Add client information in clientGroup ( clientGroup in Server Class)
+ *
+ */
+
 public class ServerAcceptHandler {
 
     private CompletionHandler<AsynchronousSocketChannel, Attachment> acceptHandler;

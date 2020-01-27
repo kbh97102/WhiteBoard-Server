@@ -18,6 +18,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.Vector;
 
+/**
+ *  Server can open with 4 pattern
+ *      1. All IP, Default Port
+ *      2. All IP, User Custom Port
+ *      3. User Custom IP, Default Port
+ *      4.  User Custom IP, User Custom Port
+ *
+ *  If accept is success Read method will keep running until shutdown
+ *  If read is success Write to All client given data
+ */
+
 public class Server implements Runnable {
 
     private final static int PORT = 3001;

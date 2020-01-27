@@ -11,6 +11,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 import java.util.function.Consumer;
 
+/**
+ * This class will work After read method
+ * Read data from client and send to all client in clientGroup
+ */
+
 public class ServerReadHandler {
 
     private CompletionHandler<Integer, Attachment> readHandler;

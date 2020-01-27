@@ -8,6 +8,11 @@ package com.thunder_cut.socket.handler;
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
 
+/**
+ * This class will work After write method
+ * Clear ByteBuffer for next write method
+ */
+
 public class ServerWriteHandler {
 
     private CompletionHandler<Integer, ByteBuffer> writeHandler;
