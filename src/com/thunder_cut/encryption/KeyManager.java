@@ -18,18 +18,40 @@ public class KeyManager {
         throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
 
+    /**
+     * Load a symmetric key.
+     *
+     * @return a symmetric key
+     */
     public static SymmetricKey getSymmetricKey() {
         return symmetricKey;
     }
 
+    /**
+     * Save a symmetric key.
+     *
+     * @param key a symmetric key
+     */
     public static void setSymmetricKey(SymmetricKey key) {
         symmetricKey = key;
     }
 
+    /**
+     * Load a public key for each client.
+     *
+     * @param client a client
+     * @return a public key
+     */
     public static PublicKey getPublicKey(AsynchronousSocketChannel client) {
         return publicKey.get(client);
     }
 
+    /**
+     * Save a public key for each client.
+     *
+     * @param client a client
+     * @param key    a public key
+     */
     public static void setPublicKey(AsynchronousSocketChannel client, PublicKey key) {
         publicKey.put(client, key);
     }
