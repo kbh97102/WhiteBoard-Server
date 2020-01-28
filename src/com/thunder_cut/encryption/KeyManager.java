@@ -6,14 +6,13 @@
 
 package com.thunder_cut.encryption;
 
-import com.thunder_cut.socket.Attachment;
-
+import java.nio.channels.AsynchronousSocketChannel;
 import java.security.PublicKey;
 import java.util.HashMap;
 
 public class KeyManager {
     private static SymmetricKey symmetricKey = null;
-    private static HashMap<Attachment, PublicKey> publicKey = new HashMap<>();
+    private static HashMap<AsynchronousSocketChannel, PublicKey> publicKey = new HashMap<>();
 
     private KeyManager() {
         throw new AssertionError("No " + getClass().getName() + " instances for you!");
@@ -27,11 +26,11 @@ public class KeyManager {
         symmetricKey = key;
     }
 
-    public static PublicKey getPublicKey(Attachment client) {
+    public static PublicKey getPublicKey(AsynchronousSocketChannel client) {
         return publicKey.get(client);
     }
 
-    public static void setPublicKey(Attachment client, PublicKey key) {
+    public static void setPublicKey(AsynchronousSocketChannel client, PublicKey key) {
         publicKey.put(client, key);
     }
 }
