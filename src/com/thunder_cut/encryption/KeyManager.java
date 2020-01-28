@@ -16,6 +16,7 @@ public class KeyManager {
     private static HashMap<Attachment, PublicKey> publicKey = new HashMap<>();
 
     private KeyManager() {
+        throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
 
     public static SymmetricKey getSymmetricKey() {

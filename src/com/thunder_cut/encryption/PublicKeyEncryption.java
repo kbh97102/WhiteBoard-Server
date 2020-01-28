@@ -13,6 +13,7 @@ import java.util.Base64;
 
 public class PublicKeyEncryption {
     private PublicKeyEncryption() {
+        throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
 
     public static byte[] encrypt(byte[] data, PublicKey key) {
