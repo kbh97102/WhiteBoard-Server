@@ -1,5 +1,5 @@
 /*
- * SymmetricKeyEncrypt.java
+ * SymmetricKeyEncryption.java
  * Author: Seokjin Yoon
  * Created Date: 2020-01-27
  */
@@ -11,8 +11,8 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
 
-public class SymmetricKeyEncrypt {
-    private SymmetricKeyEncrypt() {
+public class SymmetricKeyEncryption {
+    private SymmetricKeyEncryption() {
     }
 
     public static byte[] encrypt(byte[] data, byte[] key) {
