@@ -16,6 +16,13 @@ public class PublicKeyEncryption {
         throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
 
+    /**
+     * Encrypt data with a public key using RSA.
+     *
+     * @param data plain data
+     * @param key  a public key
+     * @return encrypted data
+     */
     public static byte[] encrypt(byte[] data, PublicKey key) {
         try {
             byte[] encrypted = getCipher(Cipher.ENCRYPT_MODE, key).doFinal(data);
