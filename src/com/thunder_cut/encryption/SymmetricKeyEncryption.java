@@ -13,6 +13,7 @@ import java.util.Base64;
 
 public class SymmetricKeyEncryption {
     private SymmetricKeyEncryption() {
+        throw new AssertionError("No " + getClass().getName() + " instances for you!");
     }
 
     public static byte[] encrypt(byte[] data, SymmetricKey key) {
@@ -37,10 +38,9 @@ public class SymmetricKeyEncryption {
         }
     }
 
-    private static Cipher getCipher(int mode, SymmetricKey symmetricKey) throws Exception {
-        byte[] key = symmetricKey.getKey();
+    private static Cipher getCipher(int mode, SymmetricKey key) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(mode, new SecretKeySpec(key, "AES"), new IvParameterSpec(key));
+        cipher.init(mode, new SecretKeySpec(key.getKey(), "AES"), new IvParameterSpec(key.getKey()));
         return cipher;
     }
 }
