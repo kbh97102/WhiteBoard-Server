@@ -8,23 +8,22 @@ package com.thunder_cut.encryption;
 
 import com.thunder_cut.socket.Attachment;
 
-import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
 import java.util.HashMap;
 
 public class KeyManager {
-    private static byte[] symmetricKey = null;
+    private static SymmetricKey symmetricKey = null;
     private static HashMap<Attachment, PublicKey> publicKey = new HashMap<>();
 
     private KeyManager() {
     }
 
-    public static byte[] getSymmetricKey() {
+    public static SymmetricKey getSymmetricKey() {
         return symmetricKey;
     }
 
-    public static void setSymmetricKey(String key) {
-        symmetricKey = key.substring(0, 128 / 8).getBytes(StandardCharsets.UTF_8);
+    public static void setSymmetricKey(SymmetricKey key) {
+        symmetricKey = key;
     }
 
     public static PublicKey getPublicKey(Attachment client) {

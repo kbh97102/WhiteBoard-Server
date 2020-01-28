@@ -15,7 +15,7 @@ public class SymmetricKeyEncryption {
     private SymmetricKeyEncryption() {
     }
 
-    public static byte[] encrypt(byte[] data, byte[] key) {
+    public static byte[] encrypt(byte[] data, SymmetricKey key) {
         try {
             byte[] encrypted = getCipher(Cipher.ENCRYPT_MODE, key).doFinal(data);
             byte[] encoded = Base64.getEncoder().encode(encrypted);
@@ -26,7 +26,7 @@ public class SymmetricKeyEncryption {
         }
     }
 
-    public static byte[] decrypt(byte[] data, byte[] key) {
+    public static byte[] decrypt(byte[] data, SymmetricKey key) {
         try {
             byte[] decoded = Base64.getDecoder().decode(data);
             byte[] decrypted = getCipher(Cipher.DECRYPT_MODE, key).doFinal(decoded);
@@ -37,7 +37,8 @@ public class SymmetricKeyEncryption {
         }
     }
 
-    private static Cipher getCipher(int mode, byte[] key) throws Exception {
+    private static Cipher getCipher(int mode, SymmetricKey symmetricKey) throws Exception {
+        byte[] key = symmetricKey.getKey();
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
         cipher.init(mode, new SecretKeySpec(key, "AES"), new IvParameterSpec(key));
         return cipher;
