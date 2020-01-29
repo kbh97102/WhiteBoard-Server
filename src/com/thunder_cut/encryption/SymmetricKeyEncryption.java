@@ -7,8 +7,7 @@
 package com.thunder_cut.encryption;
 
 import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
+import java.security.Key;
 import java.util.Base64;
 
 public class SymmetricKeyEncryption {
@@ -23,7 +22,7 @@ public class SymmetricKeyEncryption {
      * @param key  a symmetric key
      * @return encrypted data
      */
-    public static byte[] encrypt(byte[] data, SymmetricKey key) {
+    public static byte[] encrypt(byte[] data, Key key) {
         try {
             byte[] encrypted = getCipher(Cipher.ENCRYPT_MODE, key).doFinal(data);
             byte[] encoded = Base64.getEncoder().encode(encrypted);
@@ -41,7 +40,7 @@ public class SymmetricKeyEncryption {
      * @param key  a symmetric key
      * @return decrypted data
      */
-    public static byte[] decrypt(byte[] data, SymmetricKey key) {
+    public static byte[] decrypt(byte[] data, Key key) {
         try {
             byte[] decoded = Base64.getDecoder().decode(data);
             byte[] decrypted = getCipher(Cipher.DECRYPT_MODE, key).doFinal(decoded);
@@ -52,9 +51,9 @@ public class SymmetricKeyEncryption {
         }
     }
 
-    private static Cipher getCipher(int mode, SymmetricKey key) throws Exception {
-        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        cipher.init(mode, new SecretKeySpec(key.getKey(), "AES"), new IvParameterSpec(key.getKey()));
+    private static Cipher getCipher(int mode, Key key) throws Exception {
+        Cipher cipher = Cipher.getInstance("AES");
+        cipher.init(mode, key);
         return cipher;
     }
 }
