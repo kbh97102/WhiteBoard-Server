@@ -7,11 +7,12 @@
 package com.thunder_cut.encryption;
 
 import java.nio.channels.AsynchronousSocketChannel;
+import java.security.Key;
 import java.security.PublicKey;
 import java.util.HashMap;
 
 public class KeyManager {
-    private static SymmetricKey symmetricKey = null;
+    private static Key symmetricKey = null;
     private static HashMap<AsynchronousSocketChannel, PublicKey> publicKey = new HashMap<>();
 
     private KeyManager() {
@@ -23,7 +24,7 @@ public class KeyManager {
      *
      * @return a symmetric key
      */
-    public static SymmetricKey getSymmetricKey() {
+    public static Key getSymmetricKey() {
         return symmetricKey;
     }
 
@@ -32,7 +33,7 @@ public class KeyManager {
      *
      * @param key a symmetric key
      */
-    public static void setSymmetricKey(SymmetricKey key) {
+    public static void setSymmetricKey(Key key) {
         symmetricKey = key;
     }
 
