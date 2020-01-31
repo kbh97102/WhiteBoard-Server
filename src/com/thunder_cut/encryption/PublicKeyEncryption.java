@@ -8,6 +8,7 @@ package com.thunder_cut.encryption;
 
 import javax.crypto.Cipher;
 import java.security.Key;
+import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.Base64;
 
@@ -28,6 +29,24 @@ public class PublicKeyEncryption {
             byte[] encrypted = getCipher(Cipher.ENCRYPT_MODE, key).doFinal(data);
             byte[] encoded = Base64.getEncoder().encode(encrypted);
             return encoded;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Decrypt data with a private key using RSA.
+     *
+     * @param data encrypted data
+     * @param key  a private key
+     * @return decrypted data
+     */
+    public static byte[] decrypt(byte[] data, PrivateKey key) {
+        try {
+            byte[] decoded = Base64.getDecoder().decode(data);
+            byte[] decrypted = getCipher(Cipher.DECRYPT_MODE, key).doFinal(decoded);
+            return decrypted;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
