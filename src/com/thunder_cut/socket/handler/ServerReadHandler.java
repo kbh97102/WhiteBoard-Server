@@ -34,10 +34,7 @@ public class ServerReadHandler {
              */
             @Override
             public void completed(Integer result, Attachment attachment) {
-                Charset charset = StandardCharsets.UTF_8;
                 attachment.getBuffer().flip();
-                String data = charset.decode(attachment.getBuffer()).toString();
-                System.out.println(data);
                 sendToAllClient.accept(attachment.getBuffer());
                 attachment.getClient().read(attachment.getBuffer(),attachment,this);
             }

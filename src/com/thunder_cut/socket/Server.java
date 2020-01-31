@@ -11,6 +11,7 @@ import com.thunder_cut.socket.handler.ServerWriteHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.nio.charset.Charset;
@@ -113,9 +114,17 @@ public class Server implements Runnable {
      * @param data Data
      */
     private void writeToAllClients(ByteBuffer data) {
-        for (Attachment clientInfo : clientGroup) {
-            clientInfo.getClient().write(data, data, new ServerWriteHandler().getWriteHandler());
+        try{
+            for (Attachment clientInfo : clientGroup) {
+//                clientInfo.getClient().write(data, data, new ServerWriteHandler().getWriteHandler());
+                clientInfo.getClient().write(data);
+            }
+            data.clear();
         }
+        catch (BufferOverflowException overflow){
+            overflow.printStackTrace();
+        }
+
     }
 
 
