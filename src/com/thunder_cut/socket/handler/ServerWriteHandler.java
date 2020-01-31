@@ -27,6 +27,7 @@ public class ServerWriteHandler {
             @Override
             public void failed(Throwable exc, ByteBuffer attachment) {
                 System.out.println("Server Write Error");
+                exc.printStackTrace();
             }
         };
     }

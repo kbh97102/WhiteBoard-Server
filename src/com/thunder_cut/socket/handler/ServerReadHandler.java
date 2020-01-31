@@ -9,6 +9,9 @@ import com.thunder_cut.socket.Attachment;
 
 import java.nio.ByteBuffer;
 import java.nio.channels.CompletionHandler;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.util.Vector;
 import java.util.function.Consumer;
 
 /**
@@ -31,13 +34,23 @@ public class ServerReadHandler {
              */
             @Override
             public void completed(Integer result, Attachment attachment) {
+                Charset charset = StandardCharsets.UTF_8;
+                attachment.getBuffer().flip();
+                String data = charset.decode(attachment.getBuffer()).toString();
+                System.out.println(data);
                 sendToAllClient.accept(attachment.getBuffer());
                 attachment.getClient().read(attachment.getBuffer(),attachment,this);
             }
 
             @Override
             public void failed(Throwable exc, Attachment attachment) {
-                System.out.println("Server Read Error");
+                Vector<?> clientGroup = attachment.getClientGroup();
+                if(clientGroup.size() > 0){
+                    clientGroup.remove(attachment);
+                }
+                else{
+                    System.out.println("Server Read Error");
+                }
             }
         };
     }

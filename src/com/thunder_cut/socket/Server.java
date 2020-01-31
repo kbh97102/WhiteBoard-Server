@@ -114,7 +114,7 @@ public class Server implements Runnable {
      */
     private void writeToAllClients(ByteBuffer data) {
         for (Attachment clientInfo : clientGroup) {
-            clientInfo.getClient().write(data, data, serverWriteHandler.getWriteHandler());
+            clientInfo.getClient().write(data, data, new ServerWriteHandler().getWriteHandler());
         }
     }
 
