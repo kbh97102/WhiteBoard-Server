@@ -73,7 +73,6 @@ public class Server {
                 } catch (InterruptedException | ExecutionException e) {
                     e.printStackTrace();
                 }
-                System.out.println("Write Success");
                 clientInfo.setReadyToWrite(false);
                 clientInfo.getBuffer().clear();
                 clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, new ReadSizeHandler().getReadSizeHandler());

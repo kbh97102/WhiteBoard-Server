@@ -14,7 +14,6 @@ public class ReadDataHandler {
         readDataHandler = new CompletionHandler<Integer, ClientAttachment>() {
             @Override
             public void completed(Integer result, ClientAttachment attachment) {
-                System.out.println("Read Data : " + attachment.getBuffer().toString());
                 attachment.getBuffer().flip();
                 attachment.setReadyToWrite(true);
             }
