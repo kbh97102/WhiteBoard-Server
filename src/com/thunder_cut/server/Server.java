@@ -3,11 +3,14 @@ package com.thunder_cut.server;
 import com.thunder_cut.server.attachment.AcceptAttachment;
 import com.thunder_cut.server.attachment.ClientAttachment;
 import com.thunder_cut.server.handler.AcceptHandler;
+import com.thunder_cut.server.handler.ReadSizeHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
 import java.util.Vector;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 public class Server {
     private static final int PORT = 3001;
@@ -60,5 +63,22 @@ public class Server {
         server.accept(acceptInfo, new AcceptHandler().getAcceptHandler());
     }
 
+    public void write() {
+        for (int i = 0; i < clientGroup.size(); i++) {
+            ClientAttachment clientInfo = clientGroup.get(i);
+            if (clientInfo.isReadyToWrite()) {
+                Future<?> writeFuture = clientInfo.getClient().write(clientInfo.getBuffer());
+                try {
+                    writeFuture.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("Write Success");
+                clientInfo.setReadyToWrite(false);
+                clientInfo.getBuffer().clear();
+                clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, new ReadSizeHandler().getReadSizeHandler());
+            }
+        }
+    }
 }
 
