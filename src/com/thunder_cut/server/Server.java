@@ -80,5 +80,14 @@ public class Server {
             }
         }
     }
+
+    public void run() {
+        accept();
+        new Thread(() -> {
+            while (true) {
+                write();
+            }
+        }).start();
+    }
 }
 
