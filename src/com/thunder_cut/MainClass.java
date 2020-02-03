@@ -6,7 +6,7 @@
 
 package com.thunder_cut;
 
-import com.thunder_cut.socket.Server;
+import com.thunder_cut.server.Server;
 
 public class MainClass {
     public static void main(String[] args) {
@@ -21,7 +21,6 @@ public class MainClass {
             int port = Integer.parseInt(args[1]);
             server = new Server(ip, port);
         }
-        Thread serverThread = new Thread(server);
-        serverThread.start();
+        server.run();
     }
 }
