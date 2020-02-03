@@ -1,5 +1,7 @@
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.attachment.ClientAttachment;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.AsynchronousServerSocketChannel;
@@ -48,5 +50,6 @@ public class Server {
             e.printStackTrace();
         }
     }
+
 }
 
