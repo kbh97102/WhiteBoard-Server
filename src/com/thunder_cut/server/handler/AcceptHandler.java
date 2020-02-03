@@ -12,13 +12,13 @@ public class AcceptHandler {
 
     private CompletionHandler<AsynchronousSocketChannel, AcceptAttachment> acceptHandler;
 
-    public AcceptHandler(){
+    public AcceptHandler() {
 
         acceptHandler = new CompletionHandler<AsynchronousSocketChannel, AcceptAttachment>() {
             @Override
             public void completed(AsynchronousSocketChannel result, AcceptAttachment attachment) {
                 try {
-                    System.out.println(result.getRemoteAddress()+" is connect");
+                    System.out.println(result.getRemoteAddress() + " is connect");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -30,10 +30,10 @@ public class AcceptHandler {
                 attachment.getClientGroup().add(clientInfo);
                 clientInfo.setClientGroup(attachment.getClientGroup());
 
-                attachment.getServer().accept(attachment,this);
+                attachment.getServer().accept(attachment, this);
 
                 clientInfo.setReadyToWrite(false);
-
+                clientInfo.getClient().read(clientInfo.getBuffer(), clientInfo, new ReadSizeHandler().getReadSizeHandler());
             }
 
             @Override
@@ -43,7 +43,7 @@ public class AcceptHandler {
         };
     }
 
-    public CompletionHandler<AsynchronousSocketChannel, AcceptAttachment> getAcceptHandler(){
+    public CompletionHandler<AsynchronousSocketChannel, AcceptAttachment> getAcceptHandler() {
         return acceptHandler;
     }
 }
