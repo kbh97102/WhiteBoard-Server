@@ -2,6 +2,7 @@ package com.thunder_cut.server;
 
 import com.thunder_cut.server.attachment.AcceptAttachment;
 import com.thunder_cut.server.attachment.ClientAttachment;
+import com.thunder_cut.server.handler.AcceptHandler;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -52,6 +53,12 @@ public class Server {
         }
     }
 
+    public void accept() {
+        AcceptAttachment acceptInfo = new AcceptAttachment();
+        acceptInfo.setServer(server);
+        acceptInfo.setClientGroup(clientGroup);
+        server.accept(acceptInfo, new AcceptHandler().getAcceptHandler());
+    }
 
 }
 
