@@ -7,6 +7,9 @@ package com.thunder_cut.server;
 
 import java.nio.ByteBuffer;
 
+/**
+ * Generate data for send to all client
+ */
 public class SendingData {
 
     public final DataType dataType;

@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class has information, read and write about connected client
+ */
 public class ClientInformation {
 
     private static final Map<Character, DataType> dataTypeMap;
@@ -47,7 +50,7 @@ public class ClientInformation {
     private void reading() {
         while (true) {
             try {
-                //헤더만 먼저 읽어서 판단
+                //read header
                 ByteBuffer buffer = ByteBuffer.allocate(6);
                 client.read(buffer);
                 buffer.flip();
@@ -57,7 +60,7 @@ public class ClientInformation {
 
                 buffer = ByteBuffer.allocate(size);
 
-                //데이터 읽기
+                //read data
                 client.read(buffer);
                 buffer.flip();
 
@@ -66,9 +69,9 @@ public class ClientInformation {
                     for (ClientInformation destination : clientGroup) {
                         SendingData sendingData = new SendingData(ID, destination.ID, dataTypeMap.get(type), buffer.array());
                         int written = destination.getClient().write(sendingData.toByteBuffer());
-                        //실패시 제거
-                        if(written == 0){
-                            System.out.println(destination.getClient().getRemoteAddress()+" is disconnected");
+                        //If writing failed, remove this client
+                        if (written == 0) {
+                            System.out.println(destination.getClient().getRemoteAddress() + " is disconnected");
                             destination.getClient().close();
                             clientGroup.remove(destination);
                         }

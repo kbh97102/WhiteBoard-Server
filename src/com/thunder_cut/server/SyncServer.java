@@ -16,6 +16,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * This class is main class about server
+ * If program start, generate server and bind given data
+ * Accept method keep running until program is shutdown
+ */
 public class SyncServer {
 
     private static final int PORT = 3001;
