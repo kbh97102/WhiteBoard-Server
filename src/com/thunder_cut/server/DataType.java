@@ -1,4 +1,4 @@
-package NoAscync;
+package com.thunder_cut.server;
 
 // public final 로 생성해서 접근하는게 좋음
 // enum은 변경 될 일 없음 변경되면 안됨

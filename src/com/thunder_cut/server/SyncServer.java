@@ -3,7 +3,8 @@
  * Author : Arakene
  * Created Date : 2020-02-04
  */
-package NoAscync;
+
+package com.thunder_cut.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -22,10 +23,39 @@ public class SyncServer {
     private ExecutorService executorService;
     private final List<ClientInformation> clientGroup;
 
+    /**
+     * All IP, Default Port
+     */
     public SyncServer() {
+        this(null, PORT);
+    }
+
+    /**
+     * All IP, Custom Port
+     *
+     * @param port Custom Port is that user want to connect
+     */
+    public SyncServer(int port) {
+        this(null, port);
+    }
+
+    /**
+     * Specific IP, Default Port
+     *
+     * @param ip Specific IP is that user want to connect
+     */
+    public SyncServer(String ip) {
+        this(ip, PORT);
+    }
+
+    /**
+     * @param ip   Custom IP
+     * @param port Custom Port
+     */
+    public SyncServer(String ip, int port) {
         try {
             server = ServerSocketChannel.open();
-            server.bind(new InetSocketAddress(PORT));
+            server.bind(ip == null ? new InetSocketAddress(port) : new InetSocketAddress(ip, port));
             initialize();
         } catch (IOException e) {
             e.printStackTrace();
