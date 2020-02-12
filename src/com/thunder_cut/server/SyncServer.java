@@ -8,6 +8,7 @@ package com.thunder_cut.server;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.*;
@@ -95,6 +96,35 @@ public class SyncServer {
                 clientInformation.read();
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    private void writeToAll(int srcID, char type, ByteBuffer buffer) {
+        synchronized (clientGroup) {
+            for (ClientInformation destination : clientGroup) {
+                SendingData sendingData = new SendingData(srcID, destination.ID, dataTypeMap.get(type), buffer.array());
+                try {
+                    destination.getClient().write(sendingData.toByteBuffer());
+                } catch (IOException e) {
+                    return;
+                }
+            }
+        }
+    }
+
+    private void writeToSrc(int srcID, char type, ByteBuffer buffer) {
+        synchronized (clientGroup) {
+            for (ClientInformation destination : clientGroup) {
+                if (destination.ID == srcID) {
+                    SendingData sendingData = new SendingData(srcID, destination.ID, dataTypeMap.get(type), buffer.array());
+                    try {
+                        destination.getClient().write(sendingData.toByteBuffer());
+                    } catch (IOException e) {
+                        return;
+                    }
+                    break;
+                }
             }
         }
     }
