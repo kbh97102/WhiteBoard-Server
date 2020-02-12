@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -23,10 +21,18 @@ import java.util.concurrent.Executors;
  */
 public class SyncServer {
 
+    private static final Map<Character, DataType> dataTypeMap;
     private static final int PORT = 3001;
     private ServerSocketChannel server;
     private ExecutorService executorService;
     private final List<ClientInformation> clientGroup;
+
+    static {
+        dataTypeMap = new HashMap<>();
+        for (DataType dataTypeEnum : DataType.values()) {
+            dataTypeMap.put(dataTypeEnum.type, dataTypeEnum);
+        }
+    }
 
     /**
      * All IP, Default Port
@@ -81,13 +87,11 @@ public class SyncServer {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connect");
-                ClientInformation clientInformation = new ClientInformation(clientGroup, clientGroup.size() + 1);
+                ClientInformation clientInformation = new ClientInformation(clientGroup.size());
                 clientInformation.setClient(client);
-
                 synchronized (clientGroup) {
                     clientGroup.add(clientInformation);
                 }
-
                 clientInformation.read();
             } catch (IOException e) {
                 e.printStackTrace();
