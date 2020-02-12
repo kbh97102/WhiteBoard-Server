@@ -43,6 +43,12 @@ public class ClientInformation {
         writeToAll = callBack;
     }
 
+    /**
+     *  1. Allocate ByteBuffer with header size and read header
+     *  2. Figure out data type, data size and allcate ByteBuffer with data size
+     *  3. Receive data until buffer has no space
+     *  4. Give ID, data type and data(no header) to write
+     */
     private void reading() {
         while (true) {
             ByteBuffer buffer = ByteBuffer.allocate(6);

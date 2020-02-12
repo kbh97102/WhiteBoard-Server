@@ -83,6 +83,10 @@ public class SyncServer {
         executorService.submit(this::accept);
     }
 
+    /**
+     * Detect client connection and Generate ClientInformation with connected client
+     * After Generating Add clientGroup and start readingData from client
+     */
     private void accept() {
         ClientInformation.WriteCallBack sending = this::identifyWriteMode;
         while (true) {
@@ -102,6 +106,14 @@ public class SyncServer {
         }
     }
 
+    /**
+     * Check dataType and decide writeMode
+     * If type is command, send data to srcID
+     * or write to everyone
+     * @param srcID client who send data
+     * @param type data type
+     * @param buffer pure data(No header)
+     */
     private void identifyWriteMode(int srcID, char type, ByteBuffer buffer) {
         if (dataTypeMap.get(type) == DataType.CMD) {
             writeToSrc(srcID, type, buffer);
@@ -110,6 +122,12 @@ public class SyncServer {
         }
     }
 
+    /**
+     * Generate with srcID, data type, pure data and Write to everyone in clientGroup
+     * @param srcID client who send data
+     * @param type data type
+     * @param buffer pure data(No header)
+     */
     private void writeToAll(int srcID, char type, ByteBuffer buffer) {
         synchronized (clientGroup) {
             for (ClientInformation destination : clientGroup) {
@@ -124,6 +142,12 @@ public class SyncServer {
         }
     }
 
+    /**
+     * Generate with srcID, data type, pure data and Write to given srcID
+     * @param srcID client who send data
+     * @param type data type
+     * @param buffer pure data(No header)
+     */
     private void writeToSrc(int srcID, char type, ByteBuffer buffer) {
         synchronized (clientGroup) {
             for (ClientInformation destination : clientGroup) {
@@ -141,6 +165,11 @@ public class SyncServer {
         }
     }
 
+    /**
+     * Remove disconnected client in clientGroup
+     * After that change client's ID by ascending sort
+     * @param removeTarget disconnected client
+     */
     private void removeClient(ClientInformation removeTarget) {
         System.out.println("Client " + removeTarget.ID + " is disconnected");
         clientGroup.remove(removeTarget);
