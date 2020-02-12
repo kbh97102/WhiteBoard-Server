@@ -84,12 +84,14 @@ public class SyncServer {
     }
 
     private void accept() {
+        ClientInformation.WriteCallBack sending = this::identifyWriteMode;
         while (true) {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connect");
                 ClientInformation clientInformation = new ClientInformation(clientGroup.size());
                 clientInformation.setClient(client);
+                clientInformation.setSending(sending);
                 synchronized (clientGroup) {
                     clientGroup.add(clientInformation);
                 }
@@ -107,7 +109,7 @@ public class SyncServer {
             writeToAll(srcID, type, buffer);
         }
     }
-    
+
     private void writeToAll(int srcID, char type, ByteBuffer buffer) {
         synchronized (clientGroup) {
             for (ClientInformation destination : clientGroup) {
