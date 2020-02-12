@@ -79,6 +79,9 @@ public class SyncServer {
         executorService = Executors.newFixedThreadPool(10);
     }
 
+    /**
+     * Start Server
+     */
     public void run() {
         executorService.submit(this::accept);
     }

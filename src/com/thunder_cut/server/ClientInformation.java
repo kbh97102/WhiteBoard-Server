@@ -45,7 +45,7 @@ public class ClientInformation {
 
     /**
      *  1. Allocate ByteBuffer with header size and read header
-     *  2. Figure out data type, data size and allcate ByteBuffer with data size
+     *  2. Figure out data type, data size and allocate ByteBuffer with data size
      *  3. Receive data until buffer has no space
      *  4. Give ID, data type and data(no header) to write
      */
