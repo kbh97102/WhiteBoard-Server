@@ -61,10 +61,10 @@ public class SyncServer {
         try {
             server = ServerSocketChannel.open();
             server.bind(ip == null ? new InetSocketAddress(port) : new InetSocketAddress(ip, port));
-            initialize();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        initialize();
         clientGroup = Collections.synchronizedList(new ArrayList<>());
     }
 

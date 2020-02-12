@@ -8,30 +8,22 @@ package com.thunder_cut.server;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * This class has information, read and write about connected client
  */
 public class ClientInformation {
 
-    private static final Map<Character, DataType> dataTypeMap;
-
-    private SocketChannel client;
-    private final List<ClientInformation> clientGroup;
-    public final int ID;
-
-    static {
-        dataTypeMap = new HashMap<>();
-        for (DataType dataTypeEnum : DataType.values()) {
-            dataTypeMap.put(dataTypeEnum.type, dataTypeEnum);
-        }
+    interface WriteCallBack {
+        void write(int srcID, char type, ByteBuffer buffer);
     }
 
-    public ClientInformation(List<ClientInformation> clientGroup, int ID) {
-        this.clientGroup = clientGroup;
+    public int ID;
+
+    private SocketChannel client;
+    private WriteCallBack writeToAll;
+
+    public ClientInformation(int ID) {
         this.ID = ID;
     }
 
@@ -47,43 +39,34 @@ public class ClientInformation {
         new Thread(this::reading).start();
     }
 
+    public void setSending(WriteCallBack callBack) {
+        writeToAll = callBack;
+    }
+
     private void reading() {
         while (true) {
+            ByteBuffer buffer = ByteBuffer.allocate(6);
             try {
-                //read header
-                ByteBuffer buffer = ByteBuffer.allocate(6);
                 client.read(buffer);
-                buffer.flip();
-
-                char type = buffer.getChar();
-                int size = buffer.getInt();
-
-                buffer = ByteBuffer.allocate(size);
-
-                //read data
-                client.read(buffer);
-                buffer.flip();
-
-                //Generate Data and Send to All
-                synchronized (clientGroup) {
-                    for (ClientInformation destination : clientGroup) {
-                        SendingData sendingData = new SendingData(ID, destination.ID, dataTypeMap.get(type), buffer.array());
-                        int written = destination.getClient().write(sendingData.toByteBuffer());
-                        //If writing failed, remove this client
-                        if (written == 0) {
-                            System.out.println(destination.getClient().getRemoteAddress() + " is disconnected");
-                            destination.getClient().close();
-                            clientGroup.remove(destination);
-                        }
-                    }
-                }
-
             } catch (IOException e) {
-                e.printStackTrace();
-                System.exit(0);
+                break;
             }
+            buffer.flip();
+
+            char type = buffer.getChar();
+            int size = buffer.getInt();
+            buffer = ByteBuffer.allocate(size);
+
+            while (buffer.hasRemaining()) {
+                try {
+                    client.read(buffer);
+                } catch (IOException e) {
+                    break;
+                }
+            }
+
+            buffer.flip();
+            writeToAll.write(ID, type, buffer);
         }
     }
 }
-
-
