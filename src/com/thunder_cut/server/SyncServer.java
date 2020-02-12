@@ -100,6 +100,14 @@ public class SyncServer {
         }
     }
 
+    private void identifyWriteMode(int srcID, char type, ByteBuffer buffer) {
+        if (dataTypeMap.get(type) == DataType.CMD) {
+            writeToSrc(srcID, type, buffer);
+        } else {
+            writeToAll(srcID, type, buffer);
+        }
+    }
+    
     private void writeToAll(int srcID, char type, ByteBuffer buffer) {
         synchronized (clientGroup) {
             for (ClientInformation destination : clientGroup) {
