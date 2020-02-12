@@ -6,14 +6,16 @@
 
 package com.thunder_cut.encryption;
 
-import java.nio.channels.AsynchronousSocketChannel;
+import javax.crypto.KeyGenerator;
+import java.nio.channels.SocketChannel;
 import java.security.Key;
 import java.security.PublicKey;
+import java.security.SecureRandom;
 import java.util.HashMap;
 
 public class KeyManager {
     private Key symmetricKey;
-    private HashMap<AsynchronousSocketChannel, PublicKey> publicKey;
+    private HashMap<SocketChannel, PublicKey> publicKey;
 
     public KeyManager() {
         symmetricKey = null;
@@ -39,12 +41,31 @@ public class KeyManager {
     }
 
     /**
+     * Generate a symmetric key with secure random.
+     *
+     * @param strength
+     * @return a symmetric key
+     */
+    public static Key generateSymmetricKey(int strength) {
+        try {
+            KeyGenerator keyGenerator = KeyGenerator.getInstance("AES");
+            SecureRandom secureRandom = SecureRandom.getInstance("SHA1PRNG");
+            keyGenerator.init(strength, secureRandom);
+            Key key = keyGenerator.generateKey();
+            return key;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
      * Load a public key for each client.
      *
      * @param client a client
      * @return a public key
      */
-    public PublicKey getPublicKey(AsynchronousSocketChannel client) {
+    public PublicKey getPublicKey(SocketChannel client) {
         return publicKey.get(client);
     }
 
@@ -54,7 +75,17 @@ public class KeyManager {
      * @param client a client
      * @param key    a public key
      */
-    public void setPublicKey(AsynchronousSocketChannel client, PublicKey key) {
+    public void setPublicKey(SocketChannel client, PublicKey key) {
         publicKey.put(client, key);
+    }
+
+    /**
+     * Remove a public key.
+     *
+     * @param client a client
+     * @return a public key
+     */
+    public PublicKey removePublicKey(SocketChannel client) {
+        return publicKey.remove(client);
     }
 }
