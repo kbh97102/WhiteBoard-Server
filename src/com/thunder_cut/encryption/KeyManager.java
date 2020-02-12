@@ -12,11 +12,12 @@ import java.security.PublicKey;
 import java.util.HashMap;
 
 public class KeyManager {
-    private static Key symmetricKey = null;
-    private static HashMap<AsynchronousSocketChannel, PublicKey> publicKey = new HashMap<>();
+    private Key symmetricKey;
+    private HashMap<AsynchronousSocketChannel, PublicKey> publicKey;
 
-    private KeyManager() {
-        throw new AssertionError("No " + getClass().getName() + " instances for you!");
+    public KeyManager() {
+        symmetricKey = null;
+        publicKey = new HashMap<>();
     }
 
     /**
@@ -24,7 +25,7 @@ public class KeyManager {
      *
      * @return a symmetric key
      */
-    public static Key getSymmetricKey() {
+    public Key getSymmetricKey() {
         return symmetricKey;
     }
 
@@ -33,7 +34,7 @@ public class KeyManager {
      *
      * @param key a symmetric key
      */
-    public static void setSymmetricKey(Key key) {
+    public void setSymmetricKey(Key key) {
         symmetricKey = key;
     }
 
@@ -43,7 +44,7 @@ public class KeyManager {
      * @param client a client
      * @return a public key
      */
-    public static PublicKey getPublicKey(AsynchronousSocketChannel client) {
+    public PublicKey getPublicKey(AsynchronousSocketChannel client) {
         return publicKey.get(client);
     }
 
@@ -53,7 +54,7 @@ public class KeyManager {
      * @param client a client
      * @param key    a public key
      */
-    public static void setPublicKey(AsynchronousSocketChannel client, PublicKey key) {
+    public void setPublicKey(AsynchronousSocketChannel client, PublicKey key) {
         publicKey.put(client, key);
     }
 }

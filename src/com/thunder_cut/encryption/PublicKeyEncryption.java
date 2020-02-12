@@ -13,8 +13,7 @@ import java.security.PublicKey;
 import java.util.Base64;
 
 public class PublicKeyEncryption {
-    private PublicKeyEncryption() {
-        throw new AssertionError("No " + getClass().getName() + " instances for you!");
+    public PublicKeyEncryption() {
     }
 
     /**
@@ -24,7 +23,7 @@ public class PublicKeyEncryption {
      * @param key  a public key
      * @return encrypted data
      */
-    public static byte[] encrypt(byte[] data, PublicKey key) {
+    public byte[] encrypt(byte[] data, PublicKey key) {
         try {
             byte[] encrypted = getCipher(Cipher.ENCRYPT_MODE, key).doFinal(data);
             byte[] encoded = Base64.getEncoder().encode(encrypted);
@@ -42,7 +41,7 @@ public class PublicKeyEncryption {
      * @param key  a private key
      * @return decrypted data
      */
-    public static byte[] decrypt(byte[] data, PrivateKey key) {
+    public byte[] decrypt(byte[] data, PrivateKey key) {
         try {
             byte[] decoded = Base64.getDecoder().decode(data);
             byte[] decrypted = getCipher(Cipher.DECRYPT_MODE, key).doFinal(decoded);
@@ -53,7 +52,7 @@ public class PublicKeyEncryption {
         }
     }
 
-    private static Cipher getCipher(int mode, Key key) throws Exception {
+    private Cipher getCipher(int mode, Key key) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(mode, key);
         return cipher;
