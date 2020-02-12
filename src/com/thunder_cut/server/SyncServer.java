@@ -179,7 +179,6 @@ public class SyncServer {
         synchronized (clientGroup) {
             for (int i = 0; i < clientGroup.size(); i++) {
                 clientGroup.get(i).ID = i;
-                System.out.println(clientGroup.get(i).ID + " Size : " + clientGroup.size());
             }
         }
     }
