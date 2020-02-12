@@ -117,6 +117,7 @@ public class SyncServer {
                 try {
                     destination.getClient().write(sendingData.toByteBuffer());
                 } catch (IOException e) {
+                    removeClient(destination);
                     return;
                 }
             }
@@ -131,6 +132,7 @@ public class SyncServer {
                     try {
                         destination.getClient().write(sendingData.toByteBuffer());
                     } catch (IOException e) {
+                        removeClient(destination);
                         return;
                     }
                     break;
@@ -138,4 +140,16 @@ public class SyncServer {
             }
         }
     }
+
+    private void removeClient(ClientInformation removeTarget) {
+        System.out.println("Client " + removeTarget.ID + " is disconnected");
+        clientGroup.remove(removeTarget);
+        synchronized (clientGroup) {
+            for (int i = 0; i < clientGroup.size(); i++) {
+                clientGroup.get(i).ID = i;
+                System.out.println(clientGroup.get(i).ID + " Size : " + clientGroup.size());
+            }
+        }
+    }
+
 }
