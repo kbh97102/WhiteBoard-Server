@@ -6,22 +6,22 @@
 
 package com.thunder_cut;
 
-import com.thunder_cut.socket.Server;
+import com.thunder_cut.server.SyncServer;
 
 public class MainClass {
     public static void main(String[] args) {
-        Server server;
+        SyncServer server;
         if (args.length == 0) {
-            server = new Server();
+            server = new SyncServer();
         } else if (args.length == 1) {
             int port = Integer.parseInt(args[0]);
-            server = new Server(port);
+            server = new SyncServer(port);
         } else {
             String ip = args[0];
             int port = Integer.parseInt(args[1]);
-            server = new Server(ip, port);
+            server = new SyncServer(ip, port);
         }
-        Thread serverThread = new Thread(server);
-        serverThread.start();
+
+        server.run();
     }
 }
