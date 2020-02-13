@@ -10,7 +10,9 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -107,55 +109,39 @@ public class SyncServer implements ClientCallback {
      */
     private void identifyWriteMode(ClientInformation src, DataType type, byte[] data) {
         if (type == DataType.CMD) {
-            writeToSrc(src, type, data);
+            send(src, type, data, src);
         } else {
-            writeToAll(src, type, data);
+            send(src, type, data);
         }
     }
 
     /**
-     * Generate with srcID, data type, pure data and Write to everyone in clientGroup
+     * Generate with srcID, data type, pure data and Send to a specific client.
+     *
+     * @param src  client who send data
+     * @param type data type
+     * @param data pure data(No header)
+     * @param dest
+     */
+    public void send(ClientInformation src, DataType type, byte[] data, ClientInformation dest) {
+        SendingData sendingData = new SendingData(clientGroup.indexOf(src), clientGroup.indexOf(dest), type, data);
+        try {
+            dest.getClient().write(sendingData.toByteBuffer());
+        } catch (IOException e) {
+            removeClient(dest);
+        }
+    }
+
+    /**
+     * Generate with srcID, data type, pure data and Send to everyone in clientGroup
      *
      * @param src  client who send data
      * @param type data type
      * @param data pure data(No header)
      */
-    private void writeToAll(ClientInformation src, DataType type, byte[] data) {
-        synchronized (clientGroup) {
-            int srcId = clientGroup.indexOf(src);
-            for (ClientInformation destination : clientGroup) {
-                SendingData sendingData = new SendingData(srcId, clientGroup.indexOf(destination), type, data);
-                try {
-                    destination.getClient().write(sendingData.toByteBuffer());
-                } catch (IOException e) {
-                    removeClient(destination);
-                    return;
-                }
-            }
-        }
-    }
-
-    /**
-     * Generate with srcID, data type, pure data and Write to given srcID
-     *
-     * @param src  client who send data
-     * @param type data type
-     * @param data pure data(No header)
-     */
-    private void writeToSrc(ClientInformation src, DataType type, byte[] data) {
-        synchronized (clientGroup) {
-            for (ClientInformation destination : clientGroup) {
-                if (src == destination) {
-                    SendingData sendingData = new SendingData(clientGroup.indexOf(src), clientGroup.indexOf(destination), type, data);
-                    try {
-                        destination.getClient().write(sendingData.toByteBuffer());
-                    } catch (IOException e) {
-                        removeClient(destination);
-                        return;
-                    }
-                    break;
-                }
-            }
+    public void send(ClientInformation src, DataType type, byte[] data) {
+        for (ClientInformation dest : clientGroup) {
+            send(src, type, data, dest);
         }
     }
 
