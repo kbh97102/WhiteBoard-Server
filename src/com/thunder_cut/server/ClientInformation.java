@@ -13,18 +13,12 @@ import java.nio.channels.SocketChannel;
  * This class has information, read and write about connected client
  */
 public class ClientInformation {
-
-    interface WriteCallBack {
-        void write(int srcID, char type, ByteBuffer buffer);
-    }
-
-    public int ID;
-
     private SocketChannel client;
-    private WriteCallBack writeToAll;
+    private ClientCallback callback;
 
-    public ClientInformation(int ID) {
-        this.ID = ID;
+    public ClientInformation(SocketChannel client, ClientCallback callback) {
+        this.client = client;
+        this.callback = callback;
     }
 
     public SocketChannel getClient() {
@@ -39,15 +33,11 @@ public class ClientInformation {
         new Thread(this::reading).start();
     }
 
-    public void setSending(WriteCallBack callBack) {
-        writeToAll = callBack;
-    }
-
     /**
-     *  1. Allocate ByteBuffer with header size and read header
-     *  2. Figure out data type, data size and allocate ByteBuffer with data size
-     *  3. Receive data until buffer has no space
-     *  4. Give ID, data type and data(no header) to write
+     * 1. Allocate ByteBuffer with header size and read header
+     * 2. Figure out data type, data size and allocate ByteBuffer with data size
+     * 3. Receive data until buffer has no space
+     * 4. Give ID, data type and data(no header) to write
      */
     private void reading() {
         while (true) {
@@ -72,7 +62,8 @@ public class ClientInformation {
             }
 
             buffer.flip();
-            writeToAll.write(ID, type, buffer);
+            byte[] data = buffer.array();
+            callback.received(this, type, data);
         }
     }
 }
