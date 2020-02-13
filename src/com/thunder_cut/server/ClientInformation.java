@@ -62,8 +62,9 @@ public class ClientInformation {
             }
 
             buffer.flip();
+            DataType dataType = DataType.valueOf(type);
             byte[] data = buffer.array();
-            callback.received(this, type, data);
+            callback.received(this, dataType, data);
         }
     }
 }

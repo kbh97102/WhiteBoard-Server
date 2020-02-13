@@ -20,19 +20,10 @@ import java.util.concurrent.Executors;
  * Accept method keep running until program is shutdown
  */
 public class SyncServer implements ClientCallback {
-
-    private static final Map<Character, DataType> dataTypeMap;
     private static final int PORT = 3001;
     private ServerSocketChannel server;
     private ExecutorService executorService;
     private final List<ClientInformation> clientGroup;
-
-    static {
-        dataTypeMap = new HashMap<>();
-        for (DataType dataTypeEnum : DataType.values()) {
-            dataTypeMap.put(dataTypeEnum.type, dataTypeEnum);
-        }
-    }
 
     /**
      * All IP, Default Port
@@ -114,8 +105,8 @@ public class SyncServer implements ClientCallback {
      * @param type data type
      * @param data pure data(No header)
      */
-    private void identifyWriteMode(ClientInformation src, char type, byte[] data) {
-        if (dataTypeMap.get(type) == DataType.CMD) {
+    private void identifyWriteMode(ClientInformation src, DataType type, byte[] data) {
+        if (type == DataType.CMD) {
             writeToSrc(src, type, data);
         } else {
             writeToAll(src, type, data);
@@ -129,11 +120,11 @@ public class SyncServer implements ClientCallback {
      * @param type data type
      * @param data pure data(No header)
      */
-    private void writeToAll(ClientInformation src, char type, byte[] data) {
+    private void writeToAll(ClientInformation src, DataType type, byte[] data) {
         synchronized (clientGroup) {
             int srcId = clientGroup.indexOf(src);
             for (ClientInformation destination : clientGroup) {
-                SendingData sendingData = new SendingData(srcId, clientGroup.indexOf(destination), dataTypeMap.get(type), data);
+                SendingData sendingData = new SendingData(srcId, clientGroup.indexOf(destination), type, data);
                 try {
                     destination.getClient().write(sendingData.toByteBuffer());
                 } catch (IOException e) {
@@ -151,11 +142,11 @@ public class SyncServer implements ClientCallback {
      * @param type data type
      * @param data pure data(No header)
      */
-    private void writeToSrc(ClientInformation src, char type, byte[] data) {
+    private void writeToSrc(ClientInformation src, DataType type, byte[] data) {
         synchronized (clientGroup) {
             for (ClientInformation destination : clientGroup) {
                 if (src == destination) {
-                    SendingData sendingData = new SendingData(clientGroup.indexOf(src), clientGroup.indexOf(destination), dataTypeMap.get(type), data);
+                    SendingData sendingData = new SendingData(clientGroup.indexOf(src), clientGroup.indexOf(destination), type, data);
                     try {
                         destination.getClient().write(sendingData.toByteBuffer());
                     } catch (IOException e) {
@@ -180,7 +171,7 @@ public class SyncServer implements ClientCallback {
     }
 
     @Override
-    public void received(ClientInformation client, char type, byte[] data) {
+    public void received(ClientInformation client, DataType type, byte[] data) {
         identifyWriteMode(client, type, data);
     }
 }
