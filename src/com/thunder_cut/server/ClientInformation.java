@@ -25,10 +25,6 @@ public class ClientInformation {
         return client;
     }
 
-    public void setClient(SocketChannel client) {
-        this.client = client;
-    }
-
     public void read() {
         new Thread(this::reading).start();
     }
@@ -43,9 +39,11 @@ public class ClientInformation {
         while (true) {
             ByteBuffer buffer = ByteBuffer.allocate(6);
             try {
-                client.read(buffer);
+                int ret = client.read(buffer);
+                if (ret == -1) {
+                    break;
+                }
             } catch (IOException e) {
-                callback.disconnected(this);
                 break;
             }
             buffer.flip();
@@ -67,5 +65,6 @@ public class ClientInformation {
             byte[] data = buffer.array();
             callback.received(this, dataType, data);
         }
+        callback.disconnected(this);
     }
 }
