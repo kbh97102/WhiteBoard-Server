@@ -6,6 +6,7 @@
 package com.thunder_cut.server;
 
 import java.io.IOException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 
@@ -44,10 +45,13 @@ public class ClientInformation {
     }
 
     /**
-     *  1. Allocate ByteBuffer with header size and read header
-     *  2. Figure out data type, data size and allocate ByteBuffer with data size
-     *  3. Receive data until buffer has no space
-     *  4. Give ID, data type and data(no header) to write
+     * 1. Allocate ByteBuffer with header size and read header
+     * <p>
+     * 2. Figure out data type, data size and allocate ByteBuffer with data size
+     * <p>
+     * 3. Receive data until buffer has no space
+     * <p>
+     * 4. Give ID, data type and data(no header) to write
      */
     private void reading() {
         while (true) {
@@ -59,8 +63,16 @@ public class ClientInformation {
             }
             buffer.flip();
 
-            char type = buffer.getChar();
-            int size = buffer.getInt();
+            char type = 'I';
+            int size = 0;
+            try {
+                type = buffer.getChar();
+                size = buffer.getInt();
+            } catch (BufferUnderflowException e1) {
+                close();
+                break;
+            }
+
             buffer = ByteBuffer.allocate(size);
 
             while (buffer.hasRemaining()) {
@@ -74,5 +86,14 @@ public class ClientInformation {
             buffer.flip();
             writeToAll.write(ID, type, buffer);
         }
+    }
+
+    private void close() {
+        try {
+            client.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Error! Please Connect Again");
     }
 }
