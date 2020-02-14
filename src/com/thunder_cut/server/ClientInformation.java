@@ -45,6 +45,7 @@ public class ClientInformation {
             try {
                 client.read(buffer);
             } catch (IOException e) {
+                callback.disconnected(this);
                 break;
             }
             buffer.flip();

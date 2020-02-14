@@ -8,4 +8,6 @@ package com.thunder_cut.server;
 
 public interface ClientCallback {
     void received(ClientInformation client, DataType type, byte[] data);
+
+    void disconnected(ClientInformation client);
 }

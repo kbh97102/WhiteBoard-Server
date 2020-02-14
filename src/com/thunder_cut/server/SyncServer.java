@@ -112,7 +112,7 @@ public class SyncServer implements ClientCallback, Runnable {
         try {
             dest.getClient().write(sendingData.toByteBuffer());
         } catch (IOException e) {
-            removeClient(dest);
+            disconnected(dest);
         }
     }
 
@@ -129,19 +129,25 @@ public class SyncServer implements ClientCallback, Runnable {
         }
     }
 
+    @Override
+    public void received(ClientInformation client, DataType type, byte[] data) {
+        identifyWriteMode(client, type, data);
+    }
+
     /**
      * Remove disconnected client in clientGroup
      * After that change client's ID by ascending sort
      *
-     * @param removeTarget disconnected client
+     * @param client disconnected client
      */
-    private void removeClient(ClientInformation removeTarget) {
-        System.out.println("Client " + clientGroup.indexOf(removeTarget) + " is disconnected");
-        clientGroup.remove(removeTarget);
-    }
-
     @Override
-    public void received(ClientInformation client, DataType type, byte[] data) {
-        identifyWriteMode(client, type, data);
+    public void disconnected(ClientInformation client) {
+        try {
+            System.out.println(client.getClient().getRemoteAddress() + " is disconnected.");
+            client.getClient().close();
+            clientGroup.remove(client);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
