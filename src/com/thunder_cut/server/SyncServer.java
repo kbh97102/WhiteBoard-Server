@@ -12,6 +12,7 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -38,15 +39,6 @@ public class SyncServer implements ClientCallback, Runnable {
      */
     public SyncServer(int port) {
         this(null, port);
-    }
-
-    /**
-     * Specific IP, Default Port
-     *
-     * @param ip Specific IP is that user want to connect
-     */
-    public SyncServer(String ip) {
-        this(ip, PORT);
     }
 
     /**
@@ -124,7 +116,8 @@ public class SyncServer implements ClientCallback, Runnable {
      * @param data pure data(No header)
      */
     public void send(ClientInformation src, DataType type, byte[] data) {
-        for (ClientInformation dest : clientGroup) {
+        for (Iterator<ClientInformation> iterator = clientGroup.iterator(); iterator.hasNext(); ) {
+            ClientInformation dest = iterator.next();
             send(src, type, data, dest);
         }
     }
@@ -145,7 +138,9 @@ public class SyncServer implements ClientCallback, Runnable {
         try {
             System.out.println(client.getClient().getRemoteAddress() + " is disconnected.");
             client.getClient().close();
-            clientGroup.remove(client);
+            synchronized (clientGroup) {
+                clientGroup.remove(client);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
