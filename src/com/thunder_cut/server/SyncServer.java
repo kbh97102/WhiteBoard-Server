@@ -13,18 +13,15 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * This class is main class about server
  * If program start, generate server and bind given data
  * Accept method keep running until program is shutdown
  */
-public class SyncServer implements ClientCallback {
+public class SyncServer implements ClientCallback, Runnable {
     private static final int PORT = 3001;
     private ServerSocketChannel server;
-    private ExecutorService executorService;
     private final List<ClientInformation> clientGroup;
 
     /**
@@ -63,34 +60,21 @@ public class SyncServer implements ClientCallback {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        initialize();
         clientGroup = Collections.synchronizedList(new ArrayList<>());
-    }
-
-    private void initialize() {
-        executorService = Executors.newFixedThreadPool(10);
-    }
-
-    /**
-     * Start Server
-     */
-    public void run() {
-        executorService.submit(this::accept);
     }
 
     /**
      * Detect client connection and Generate ClientInformation with connected client
      * After Generating Add clientGroup and start readingData from client
      */
-    private void accept() {
+    @Override
+    public void run() {
         while (true) {
             try {
                 SocketChannel client = server.accept();
-                System.out.println(client.getRemoteAddress() + " is connect");
+                System.out.println(client.getRemoteAddress() + " is connected.");
                 ClientInformation clientInformation = new ClientInformation(client, this);
-                synchronized (clientGroup) {
-                    clientGroup.add(clientInformation);
-                }
+                clientGroup.add(clientInformation);
                 clientInformation.read();
             } catch (IOException e) {
                 e.printStackTrace();
