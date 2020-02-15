@@ -21,7 +21,6 @@ public class MainClass {
             int port = Integer.parseInt(args[1]);
             server = new SyncServer(ip, port);
         }
-
-        server.run();
+        new Thread(server).start();
     }
 }
