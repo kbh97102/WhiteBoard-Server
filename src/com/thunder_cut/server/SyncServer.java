@@ -7,15 +7,12 @@
 package com.thunder_cut.server;
 
 import com.thunder_cut.server.data.DataType;
-import com.thunder_cut.server.data.ReceivedData;
-import com.thunder_cut.server.data.SendingData;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,9 +27,6 @@ public class SyncServer {
     private ServerSocketChannel server;
     private ExecutorService executorService;
     private final List<ClientInfo> clientGroup;
-    private final Deque<ReceivedData> receivedDeque;
-    private final Deque<SendingData> writeDeque;
-    private Processing processing;
     private final Map<ClientInfo, List<ClientInfo>> blindMap;
 
     static {
@@ -83,19 +77,13 @@ public class SyncServer {
         initialize();
         clientGroup = Collections.synchronizedList(new ArrayList<>());
         blindMap = new HashMap<>();
-        receivedDeque = new ConcurrentLinkedDeque<>();
-        writeDeque = new ConcurrentLinkedDeque<>();
     }
 
     private void initialize() {
         executorService = Executors.newFixedThreadPool(10);
-        processing = new Processing();
-        Processing.ClientMapCallBack groupCallBack = this::getMap;
-        processing.setCallBack(groupCallBack, this::disconnect);
-        processing.setWrite(this::write);
     }
 
-    private Map<ClientInfo, List<ClientInfo>> getMap() {
+    private synchronized Map<ClientInfo, List<ClientInfo>> getMap() {
         return blindMap;
     }
 
@@ -104,7 +92,6 @@ public class SyncServer {
      */
     public void run() {
         executorService.submit(this::accept);
-        executorService.submit(this::process);
     }
 
     /**
@@ -112,7 +99,6 @@ public class SyncServer {
      * After Generating,  Add clientGroup and start reading Data from client
      */
     private void accept() {
-        ClientInfo.AddCallBack addCallBack = this::addQueue;
         ClientInfo.DisconnectCallBack disconnectCallBack = this::disconnect;
         while (true) {
             try {
@@ -120,7 +106,8 @@ public class SyncServer {
                 System.out.println(client.getRemoteAddress() + " is connect");
                 ClientInfo clientInformation = new ClientInfo(clientGroup.size());
                 clientInformation.setClient(client);
-                clientInformation.setCallBack(addCallBack, disconnectCallBack);
+                clientInformation.setCallBack(disconnectCallBack, this::getMap);
+                clientInformation.setOp(false);
                 synchronized (clientGroup) {
                     clientGroup.add(clientInformation);
                 }
@@ -137,30 +124,6 @@ public class SyncServer {
         }
     }
 
-    private void addQueue(ReceivedData receivedData) {
-        receivedDeque.addLast(receivedData);
-    }
-
-    private void process() {
-        while (true) {
-            synchronized (receivedDeque) {
-                if (!receivedDeque.isEmpty()) {
-                    ReceivedData data = receivedDeque.poll();
-                    processing.getProcessMap().get(data.getDataType()).accept(data);
-                }
-            }
-        }
-    }
-
-    private synchronized void write(ClientInfo dest, SendingData data) {
-        try {
-            dest.getClient().write(data.identifyType());
-        } catch (IOException e) {
-            disconnect(dest);
-        }
-    }
-
-
     /**
      * Remove disconnected client in clientGroup
      * After that change client's ID by ascending sort
@@ -176,6 +139,7 @@ public class SyncServer {
             }
         }
         synchronized (blindMap) {
+            blindMap.remove(removeTarget);
             for (ClientInfo information : blindMap.keySet()) {
                 blindMap.get(information).remove(removeTarget);
                 for (int i = 0; i < blindMap.get(information).size(); i++) {
@@ -189,5 +153,4 @@ public class SyncServer {
             e.printStackTrace();
         }
     }
-
 }

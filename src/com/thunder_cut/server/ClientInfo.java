@@ -12,25 +12,38 @@ import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
-import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This class has information, read and write about connected client
  */
 public class ClientInfo {
 
-    interface AddCallBack {
-        void add(ReceivedData result);
-    }
-    interface DisconnectCallBack{
+    interface DisconnectCallBack {
         void disconnect(ClientInfo client);
+    }
+
+    interface CallClientMap {
+        Map<ClientInfo, List<ClientInfo>> getMap();
     }
 
     public int ID;
     private String name;
     private SocketChannel client;
-    private AddCallBack addCallBack;
     private DisconnectCallBack disconnectCallBack;
+    private Process processing;
+    private boolean op;
+
+    public boolean isOp() {
+        return op;
+    }
+
+    public void setOp(boolean op) {
+        this.op = op;
+    }
+
+    private CallClientMap callMap;
 
     public ClientInfo(int ID) {
         this.ID = ID;
@@ -48,16 +61,18 @@ public class ClientInfo {
         new Thread(this::reading).start();
     }
 
-    public void setCallBack(AddCallBack add, DisconnectCallBack disconnect) {
-        this.addCallBack = add;
+    public void setCallBack(DisconnectCallBack disconnect, CallClientMap callMap) {
         this.disconnectCallBack = disconnect;
+        this.callMap = callMap;
+
+        processing = new Process(disconnect::disconnect);
     }
 
-    public void setName(String name){
+    public void setName(String name) {
         this.name = name;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
@@ -89,7 +104,6 @@ public class ClientInfo {
                 break;
             }
 
-            // "/"가 메세지의 시작이면 포함되어있으면 커맨드로 처리
             buffer = ByteBuffer.allocate(size);
 
             while (buffer.hasRemaining()) {
@@ -101,9 +115,8 @@ public class ClientInfo {
             }
 
             buffer.flip();
-//            System.out.println("Received : "+buffer.toString());
-            System.out.println(DataType.valueOf(type));            ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
-            addCallBack.add(receivedData);
+            ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
+            processing.getProcessMap().get(DataType.valueOf(type)).accept(receivedData, callMap.getMap());
         }
         disconnectCallBack.disconnect(this);
     }

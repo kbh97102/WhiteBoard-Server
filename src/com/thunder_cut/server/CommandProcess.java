@@ -13,25 +13,28 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class CommandProcess {
 
 
     private Map<Commands, BiConsumer<ReceivedData, String[]>> commandMap;
-    private Processing.DisconnectCallBack disconnectCallBack;
-    private Processing.ClientMapCallBack blindMapCallBack;
+    private Map<ClientInfo, List<ClientInfo>> clientMap;
+    private Consumer<ClientInfo> disconnect;
 
-    public CommandProcess() {
+    public CommandProcess(Map<ClientInfo, List<ClientInfo>> clientMap, Consumer<ClientInfo> disconnect) {
         commandMap = new HashMap<>();
         commandMap.put(Commands.KICK, this::kick);
         commandMap.put(Commands.OP, this::op);
         commandMap.put(Commands.BLIND, this::blind);
         commandMap.put(Commands.IGNORE, this::ignore);
         commandMap.put(Commands.SET_NAME, this::setName);
+        this.clientMap = clientMap;
+        this.disconnect = disconnect;
     }
 
     private void kick(ReceivedData data, String[] tokens) {
-        disconnectCallBack.disconnect(data.getSrc());
+        disconnect.accept(getDest(tokens[1]));
     }
 
     private void op(ReceivedData data, String[] tokens) {
@@ -42,40 +45,53 @@ public class CommandProcess {
         data.getSrc().setName(tokens[1]);
     }
 
-    //블라인드 해제도 만들어야됨
+    /**
+     * 모든 key를 돌면서 자기를 삭제
+     * 리스트에 없으면 추가 있으면 삭제
+     * @param data
+     * @param tokens
+     */
     private void blind(ReceivedData data, String[] tokens) {
-        synchronized (blindMapCallBack.getClientGroup()){
-            Map<ClientInfo, List<ClientInfo>> clientMap = blindMapCallBack.getClientGroup();
-            for(ClientInfo client : clientMap.keySet()){
-                clientMap.get(client).remove(data.getSrc());
+        for(ClientInfo key : clientMap.keySet()){
+            if(!clientMap.get(key).contains(data.getSrc())){
+                clientMap.get(key).add(data.getSrc());
+            }
+            else{
+                clientMap.get(key).remove(data.getSrc());
             }
         }
     }
 
-    //당연히 ignore 반대도 만들어야됨
+    /**
+     * Block send data from client that given data
+     * 자기꺼 리스트에 해당상대있으면 삭제
+     * 리스트에 없으면 추가 있으면 삭제
+     * @param data contains src
+     * @param tokens command tokens
+     */
     private void ignore(ReceivedData data, String[] tokens) {
-        synchronized (blindMapCallBack.getClientGroup()){
-            Map<ClientInfo, List<ClientInfo>> clientMap = blindMapCallBack.getClientGroup();
-            for(ClientInfo client : clientMap.keySet()){
-                if (client.getName().equals(tokens[1])){
-                    clientMap.get(data.getSrc()).remove(client);
-                    return;
+        ClientInfo dest = getDest(tokens[1]);
+        if (!clientMap.get(data.getSrc()).contains(dest)){
+            clientMap.get(data.getSrc()).add(dest);
+        }
+        else{
+            clientMap.get(data.getSrc()).remove(dest);
+        }
+    }
+
+    private ClientInfo getDest(String clientName){
+        for (List<ClientInfo> list : clientMap.values()) {
+            for (ClientInfo client : list) {
+                if (client.getName().equals(clientName)) {
+                    return client;
                 }
             }
         }
+        return null;
     }
-
-
 
     public Map<Commands, BiConsumer<ReceivedData, String[]>> getCommandMap() {
         return commandMap;
     }
 
-    public void setDisconnectCallBack(Processing.DisconnectCallBack disconnectCallBack) {
-        this.disconnectCallBack = disconnectCallBack;
-    }
-
-    public void setBlindMapCallBack(Processing.ClientMapCallBack blindMapCallBack) {
-        this.blindMapCallBack = blindMapCallBack;
-    }
 }
