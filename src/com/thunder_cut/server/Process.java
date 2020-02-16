@@ -19,6 +19,9 @@ import java.util.StringTokenizer;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+/**
+ * After Receiving data, work by data type
+ */
 public class Process {
 
     private Map<DataType, BiConsumer<ReceivedData, Map<ClientInfo, List<ClientInfo>>>> processMap;
@@ -32,6 +35,13 @@ public class Process {
         this.disconnect = disconnect;
     }
 
+    /**
+     * This work if type is command
+     * Split command and work with given command in command process
+     *
+     * @param data      this have data, type, src
+     * @param clientMap client list
+     */
     private void command(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
         ByteBuffer buffer = data.getBuffer();
         buffer.flip();
@@ -43,16 +53,21 @@ public class Process {
             commandToken[index++] = stringTokenizer.nextToken();
         }
         CommandProcess commandProcess = new CommandProcess(clientMap, disconnect);
-        try{
-            commandProcess.getCommandMap().get(Commands.acceptable(commandToken[0],data.getSrc().isOp())).accept(data, commandToken);
-        }
-        catch (NullPointerException e){
+        try {
+            commandProcess.getCommandMap().get(Commands.acceptable(commandToken[0], data.getSrc().isOp())).accept(data, commandToken);
+        } catch (NullPointerException e) {
             String errorMessage = "돌아가 어림도없어임마";
-            SendingData error = new SendingData(data.getSrc(), data.getSrc(), DataType.MSG,errorMessage.getBytes());
-            write(data.getSrc() ,error);
+            SendingData error = new SendingData(data.getSrc(), data.getSrc(), DataType.MSG, errorMessage.getBytes());
+            write(data.getSrc(), error);
         }
     }
 
+    /**
+     * Generate message data and write to all client in client list
+     *
+     * @param data      this have data, type, src
+     * @param clientMap client list
+     */
     private void message(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
         for (ClientInfo dest : clientMap.get(data.getSrc())) {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
@@ -60,6 +75,11 @@ public class Process {
         }
     }
 
+    /**
+     * Generate image data and write to all client in client list
+     * @param data this have data, type, src
+     * @param clientMap client list
+     */
     private void image(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
         for (ClientInfo dest : clientMap.get(data.getSrc())) {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
@@ -67,6 +87,11 @@ public class Process {
         }
     }
 
+    /**
+     * Write to client with given data
+     * @param dest client who received data
+     * @param data data for write
+     */
     private synchronized void write(ClientInfo dest, SendingData data) {
         try {
             dest.getClient().write(data.identifyType());
