@@ -102,8 +102,7 @@ public class ClientInfo {
 
             buffer.flip();
 //            System.out.println("Received : "+buffer.toString());
-            System.out.println(DataType.valueOf(type));
-            ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
+            System.out.println(DataType.valueOf(type));            ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
             addCallBack.add(receivedData);
         }
         disconnectCallBack.disconnect(this);
