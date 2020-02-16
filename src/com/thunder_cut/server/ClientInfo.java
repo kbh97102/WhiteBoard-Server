@@ -1,30 +1,38 @@
 /*
- * ClientInformation.java
+ * ClientInfo.java
  * Author : Arakene
  * Created Date : 2020-02-04
  */
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.data.DataType;
+import com.thunder_cut.server.data.ReceivedData;
+
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
 /**
  * This class has information, read and write about connected client
  */
-public class ClientInformation {
+public class ClientInfo {
 
-    interface WriteCallBack {
-        void write(int srcID, char type, ByteBuffer buffer);
+    interface AddCallBack {
+        void add(ReceivedData result);
+    }
+    interface DisconnectCallBack{
+        void disconnect(ClientInfo client);
     }
 
     public int ID;
-
+    private String name;
     private SocketChannel client;
-    private WriteCallBack writeToAll;
+    private AddCallBack addCallBack;
+    private DisconnectCallBack disconnectCallBack;
 
-    public ClientInformation(int ID) {
+    public ClientInfo(int ID) {
         this.ID = ID;
     }
 
@@ -40,8 +48,17 @@ public class ClientInformation {
         new Thread(this::reading).start();
     }
 
-    public void setSending(WriteCallBack callBack) {
-        writeToAll = callBack;
+    public void setCallBack(AddCallBack add, DisconnectCallBack disconnect) {
+        this.addCallBack = add;
+        this.disconnectCallBack = disconnect;
+    }
+
+    public void setName(String name){
+        this.name = name;
+    }
+
+    public String getName(){
+        return name;
     }
 
     /**
@@ -69,10 +86,10 @@ public class ClientInformation {
                 type = buffer.getChar();
                 size = buffer.getInt();
             } catch (BufferUnderflowException e1) {
-                close();
                 break;
             }
 
+            // "/"가 메세지의 시작이면 포함되어있으면 커맨드로 처리
             buffer = ByteBuffer.allocate(size);
 
             while (buffer.hasRemaining()) {
@@ -84,16 +101,12 @@ public class ClientInformation {
             }
 
             buffer.flip();
-            writeToAll.write(ID, type, buffer);
+//            System.out.println("Received : "+buffer.toString());
+            System.out.println(DataType.valueOf(type));
+            ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
+            addCallBack.add(receivedData);
         }
+        disconnectCallBack.disconnect(this);
     }
 
-    private void close() {
-        try {
-            client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Error! Please Connect Again");
-    }
 }

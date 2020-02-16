@@ -6,12 +6,16 @@
 
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.data.DataType;
+import com.thunder_cut.server.data.ReceivedData;
+import com.thunder_cut.server.data.SendingData;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,7 +29,11 @@ public class SyncServer {
     private static final int PORT = 3001;
     private ServerSocketChannel server;
     private ExecutorService executorService;
-    private final List<ClientInformation> clientGroup;
+    private final List<ClientInfo> clientGroup;
+    private final Deque<ReceivedData> receivedDeque;
+    private final Deque<SendingData> writeDeque;
+    private Processing processing;
+    private final Map<ClientInfo, List<ClientInfo>> blindMap;
 
     static {
         dataTypeMap = new HashMap<>();
@@ -74,10 +82,21 @@ public class SyncServer {
         }
         initialize();
         clientGroup = Collections.synchronizedList(new ArrayList<>());
+        blindMap = new HashMap<>();
+        receivedDeque = new ConcurrentLinkedDeque<>();
+        writeDeque = new ConcurrentLinkedDeque<>();
     }
 
     private void initialize() {
         executorService = Executors.newFixedThreadPool(10);
+        processing = new Processing();
+        Processing.ClientMapCallBack groupCallBack = this::getMap;
+        processing.setCallBack(groupCallBack, this::disconnect);
+        processing.setWrite(this::write);
+    }
+
+    private Map<ClientInfo, List<ClientInfo>> getMap() {
+        return blindMap;
     }
 
     /**
@@ -85,23 +104,31 @@ public class SyncServer {
      */
     public void run() {
         executorService.submit(this::accept);
+        executorService.submit(this::process);
     }
 
     /**
-     * Detect client connection and Generate ClientInformation with connected client
+     * Detect client connection and Generate ClientInfo with connected client
      * After Generating,  Add clientGroup and start reading Data from client
      */
     private void accept() {
-        ClientInformation.WriteCallBack sending = this::identifyWriteMode;
+        ClientInfo.AddCallBack addCallBack = this::addQueue;
+        ClientInfo.DisconnectCallBack disconnectCallBack = this::disconnect;
         while (true) {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connect");
-                ClientInformation clientInformation = new ClientInformation(clientGroup.size());
+                ClientInfo clientInformation = new ClientInfo(clientGroup.size());
                 clientInformation.setClient(client);
-                clientInformation.setSending(sending);
+                clientInformation.setCallBack(addCallBack, disconnectCallBack);
                 synchronized (clientGroup) {
                     clientGroup.add(clientInformation);
+                }
+                synchronized (blindMap) {
+                    for (ClientInfo information : blindMap.keySet()) {
+                        blindMap.get(information).add(clientInformation);
+                    }
+                    blindMap.put(clientInformation, clientGroup);
                 }
                 clientInformation.read();
             } catch (IOException e) {
@@ -110,67 +137,29 @@ public class SyncServer {
         }
     }
 
-    /**
-     * Check dataType and decide writeMode
-     * If type is command, send data to srcID
-     * else write to everyone
-     *
-     * @param srcID  client who send data
-     * @param type   data type
-     * @param buffer pure data(No header)
-     */
-    private void identifyWriteMode(int srcID, char type, ByteBuffer buffer) {
-        if (type == DataType.CMD.type) {
-            writeToSrc(srcID, type, buffer);
-        } else {
-            writeToAll(srcID, type, buffer);
-        }
+    private void addQueue(ReceivedData receivedData) {
+        receivedDeque.addLast(receivedData);
     }
 
-    /**
-     * Generate with srcID, data type, pure data and Write to everyone in clientGroup
-     *
-     * @param srcID  client who send data
-     * @param type   data type
-     * @param buffer pure data(No header)
-     */
-    private void writeToAll(int srcID, char type, ByteBuffer buffer) {
-        synchronized (clientGroup) {
-            for (ClientInformation destination : clientGroup) {
-                SendingData sendingData = new SendingData(srcID, destination.ID, dataTypeMap.get(type), buffer.array());
-                try {
-                    destination.getClient().write(sendingData.toByteBuffer());
-                } catch (IOException e) {
-                    removeClient(destination);
-                    return;
+    private void process() {
+        while (true) {
+            synchronized (receivedDeque) {
+                if (!receivedDeque.isEmpty()) {
+                    ReceivedData data = receivedDeque.poll();
+                    processing.getProcessMap().get(data.getDataType()).accept(data);
                 }
             }
         }
     }
 
-    /**
-     * Generate with srcID, data type, pure data and Write to given srcID
-     *
-     * @param srcID  client who send data
-     * @param type   data type
-     * @param buffer pure data(No header)
-     */
-    private void writeToSrc(int srcID, char type, ByteBuffer buffer) {
-        synchronized (clientGroup) {
-            for (ClientInformation destination : clientGroup) {
-                if (destination.ID == srcID) {
-                    SendingData sendingData = new SendingData(srcID, destination.ID, dataTypeMap.get(type), buffer.array());
-                    try {
-                        destination.getClient().write(sendingData.toByteBuffer());
-                    } catch (IOException e) {
-                        removeClient(destination);
-                        return;
-                    }
-                    break;
-                }
-            }
+    private synchronized void write(ClientInfo dest, SendingData data) {
+        try {
+            dest.getClient().write(data.identifyType());
+        } catch (IOException e) {
+            disconnect(dest);
         }
     }
+
 
     /**
      * Remove disconnected client in clientGroup
@@ -178,18 +167,26 @@ public class SyncServer {
      *
      * @param removeTarget disconnected client
      */
-    private void removeClient(ClientInformation removeTarget) {
+    private void disconnect(ClientInfo removeTarget) {
         System.out.println("Client " + removeTarget.ID + " is disconnected");
-        clientGroup.remove(removeTarget);
+        synchronized (clientGroup) {
+            clientGroup.remove(removeTarget);
+            for (int i = 0; i < clientGroup.size(); i++) {
+                clientGroup.get(i).ID = i;
+            }
+        }
+        synchronized (blindMap) {
+            for (ClientInfo information : blindMap.keySet()) {
+                blindMap.get(information).remove(removeTarget);
+                for (int i = 0; i < blindMap.get(information).size(); i++) {
+                    blindMap.get(information).get(i).ID = i;
+                }
+            }
+        }
         try {
             removeTarget.getClient().close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        synchronized (clientGroup) {
-            for (int i = 0; i < clientGroup.size(); i++) {
-                clientGroup.get(i).ID = i;
-            }
         }
     }
 

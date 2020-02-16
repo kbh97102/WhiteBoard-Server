@@ -7,6 +7,7 @@
 package com.thunder_cut;
 
 import com.thunder_cut.server.SyncServer;
+import com.thunder_cut.server.data.Commands;
 
 public class MainClass {
     public static void main(String[] args) {
