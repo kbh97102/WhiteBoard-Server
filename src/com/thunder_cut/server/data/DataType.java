@@ -11,4 +11,13 @@ public enum DataType {
     DataType(char type) {
         this.type = type;
     }
+
+    public static DataType valueOf(char type) {
+        for (DataType dataType : DataType.values()) {
+            if (dataType.type == type) {
+                return dataType;
+            }
+        }
+        return null;
+    }
 }
