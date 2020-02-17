@@ -11,6 +11,7 @@ import com.thunder_cut.server.data.ReceivedData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -45,7 +46,7 @@ public class CommandProcess {
     }
 
     private void op(ReceivedData data, String[] tokens) {
-        //클라한테 boolean값으로 소통 isClient = false면 클라기능만  true 로 바꾸면 서버기능까지
+        Objects.requireNonNull(getDest(tokens[1])).setOp(true);
     }
 
     /**
