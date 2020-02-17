@@ -10,6 +10,7 @@ import com.thunder_cut.server.SyncServer;
 
 public class MainClass {
     public static void main(String[] args) {
+
         SyncServer server;
         if (args.length == 0) {
             server = new SyncServer();

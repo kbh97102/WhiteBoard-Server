@@ -12,10 +12,7 @@ import com.thunder_cut.server.data.SendingData;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -28,7 +25,7 @@ public class Process {
     private Consumer<ClientInfo> disconnect;
 
     public Process(Consumer<ClientInfo> disconnect) {
-        processMap = new HashMap<>();
+        processMap = new EnumMap<DataType, BiConsumer<ReceivedData, Map<ClientInfo, List<ClientInfo>>>>(DataType.class);
         processMap.put(DataType.CMD, this::command);
         processMap.put(DataType.MSG, this::message);
         processMap.put(DataType.IMG, this::image);
