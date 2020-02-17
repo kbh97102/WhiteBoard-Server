@@ -94,7 +94,7 @@ public class Process {
     private synchronized void write(ClientInfo dest, SendingData data) {
         try {
             dest.getClient().write(data.identifyType());
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             disconnect.accept(dest);
         }
     }

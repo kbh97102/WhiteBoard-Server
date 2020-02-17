@@ -57,8 +57,8 @@ public class CommandProcess {
 
     /**
      * Stop write my data to all client
-     * 모든 key를 돌면서 자기를 삭제
-     * 리스트에 없으면 추가 있으면 삭제
+     * Circuit All keys in clientMap and Remove self
+     * If do not exist in list, add self
      *
      * @param data data, type, src
      * @param tokens split command
@@ -75,8 +75,8 @@ public class CommandProcess {
 
     /**
      * Block send data from client that given data
-     * 자기꺼 리스트에 해당상대있으면 삭제
-     * 리스트에 없으면 추가 있으면 삭제
+     * If target exist in list remove target
+     * else add target
      *
      * @param data   data, type, src
      * @param tokens split command
