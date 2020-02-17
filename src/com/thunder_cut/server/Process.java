@@ -53,7 +53,7 @@ public class Process {
         try {
             commandProcess.getCommandMap().get(Commands.acceptable(commandToken[0], data.getSrc().isOp())).accept(data, commandToken);
         } catch (NullPointerException e) {
-            String errorMessage = "돌아가 어림도없어임마";
+            String errorMessage = "Error! Given command do not exist";
             SendingData error = new SendingData(data.getSrc(), data.getSrc(), DataType.MSG, errorMessage.getBytes());
             write(data.getSrc(), error);
         }
