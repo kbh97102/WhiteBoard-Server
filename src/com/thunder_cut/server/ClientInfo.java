@@ -89,6 +89,7 @@ public class ClientInfo {
     private void reading() {
         while (true) {
             ByteBuffer buffer = ByteBuffer.allocate(6);
+            buffer.order(ByteOrder.BIG_ENDIAN);
             try {
                 client.read(buffer);
             } catch (IOException e) {
@@ -106,6 +107,7 @@ public class ClientInfo {
             }
 
             buffer = ByteBuffer.allocate(size);
+            buffer.order(ByteOrder.BIG_ENDIAN);
 
             while (buffer.hasRemaining()) {
                 try {
@@ -116,10 +118,7 @@ public class ClientInfo {
             }
 
             buffer.flip();
-            //양쪽만 같게끔하면 문제 없음
-//            buffer.order(ByteOrder.BIG_ENDIAN);
             ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
-//            System.out.println(new String(buffer.array()));
             processing.getProcessMap().get(DataType.valueOf(type)).accept(receivedData, callMap.getMap());
         }
         disconnectCallBack.disconnect(this);

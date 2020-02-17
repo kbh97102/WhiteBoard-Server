@@ -69,8 +69,6 @@ public class Process {
     private void message(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
         for (ClientInfo dest : clientMap.get(data.getSrc())) {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
-//            ByteBuffer buffer = ByteBuffer.wrap(sendingData.data);
-//            System.out.println(StandardCharsets.UTF_8.decode(buffer).array());
             write(dest, sendingData);
         }
     }

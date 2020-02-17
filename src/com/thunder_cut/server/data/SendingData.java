@@ -65,8 +65,6 @@ public class SendingData {
         buffer.put(data);
         buffer.flip();
 
-//        System.out.println(new String(data) +" SendData");
-
         return buffer;
     }
 

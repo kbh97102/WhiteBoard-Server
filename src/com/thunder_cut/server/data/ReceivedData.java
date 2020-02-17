@@ -30,7 +30,6 @@ public class ReceivedData {
     }
 
     public ByteBuffer getBuffer() {
-//        System.out.println(new String(buffer.array())+" ReceiveData");
         return buffer;
     }
 }
