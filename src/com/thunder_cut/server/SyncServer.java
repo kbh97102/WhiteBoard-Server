@@ -6,6 +6,8 @@
 
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.data.DataType;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;

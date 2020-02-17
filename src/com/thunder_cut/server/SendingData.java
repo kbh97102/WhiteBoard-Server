@@ -5,6 +5,8 @@
  */
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.data.DataType;
+
 import java.nio.ByteBuffer;
 
 /**
