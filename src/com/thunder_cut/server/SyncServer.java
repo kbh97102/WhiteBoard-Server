@@ -64,8 +64,6 @@ public class SyncServer {
         try {
             server = ServerSocketChannel.open();
             server.bind(ip == null ? new InetSocketAddress(port) : new InetSocketAddress(ip, port));
-            InetAddress local = InetAddress.getLocalHost();
-            System.out.println(local.getHostAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
