@@ -28,7 +28,7 @@ public class SyncServer {
     private static final int PORT = 3001;
     private ServerSocketChannel server;
     private ExecutorService executorService;
-    private final List<ClientInformation> clientGroup;
+    private final List<ClientInfo> clientGroup;
 
     static {
         dataTypeMap = new HashMap<>();
@@ -93,12 +93,12 @@ public class SyncServer {
      * After Generating Add clientGroup and start readingData from client
      */
     private void accept() {
-        ClientInformation.WriteCallBack sending = this::identifyWriteMode;
+        ClientInfo.WriteCallBack sending = this::identifyWriteMode;
         while (true) {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connect");
-                ClientInformation clientInformation = new ClientInformation(clientGroup.size());
+                ClientInfo clientInformation = new ClientInfo(clientGroup.size());
                 clientInformation.setClient(client);
                 clientInformation.setSending(sending);
                 synchronized (clientGroup) {
@@ -135,7 +135,7 @@ public class SyncServer {
      */
     private void writeToAll(int srcID, char type, ByteBuffer buffer) {
         synchronized (clientGroup) {
-            for (ClientInformation destination : clientGroup) {
+            for (ClientInfo destination : clientGroup) {
                 SendingData sendingData = new SendingData(srcID, destination.ID, dataTypeMap.get(type), buffer.array());
                 try {
                     destination.getClient().write(sendingData.toByteBuffer());
@@ -155,7 +155,7 @@ public class SyncServer {
      */
     private void writeToSrc(int srcID, char type, ByteBuffer buffer) {
         synchronized (clientGroup) {
-            for (ClientInformation destination : clientGroup) {
+            for (ClientInfo destination : clientGroup) {
                 if (destination.ID == srcID) {
                     SendingData sendingData = new SendingData(srcID, destination.ID, dataTypeMap.get(type), buffer.array());
                     try {
@@ -175,7 +175,7 @@ public class SyncServer {
      * After that change client's ID by ascending sort
      * @param removeTarget disconnected client
      */
-    private void removeClient(ClientInformation removeTarget) {
+    private void removeClient(ClientInfo removeTarget) {
         System.out.println("Client " + removeTarget.ID + " is disconnected");
         clientGroup.remove(removeTarget);
         synchronized (clientGroup) {

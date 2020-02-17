@@ -12,7 +12,7 @@ import java.nio.channels.SocketChannel;
 /**
  * This class has information, read and write about connected client
  */
-public class ClientInformation {
+public class ClientInfo {
 
     interface WriteCallBack {
         void write(int srcID, char type, ByteBuffer buffer);
@@ -23,7 +23,7 @@ public class ClientInformation {
     private SocketChannel client;
     private WriteCallBack writeToAll;
 
-    public ClientInformation(int ID) {
+    public ClientInfo(int ID) {
         this.ID = ID;
     }
 
