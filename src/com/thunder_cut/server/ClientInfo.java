@@ -11,6 +11,7 @@ import com.thunder_cut.server.data.ReceivedData;
 import java.io.IOException;
 import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.channels.SocketChannel;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,10 @@ public class ClientInfo {
             }
 
             buffer.flip();
+            //양쪽만 같게끔하면 문제 없음
+//            buffer.order(ByteOrder.BIG_ENDIAN);
             ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
+//            System.out.println(new String(buffer.array()));
             processing.getProcessMap().get(DataType.valueOf(type)).accept(receivedData, callMap.getMap());
         }
         disconnectCallBack.disconnect(this);

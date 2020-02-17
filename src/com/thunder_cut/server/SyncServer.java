@@ -9,6 +9,7 @@ package com.thunder_cut.server;
 import com.thunder_cut.server.data.DataType;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -63,6 +64,8 @@ public class SyncServer {
         try {
             server = ServerSocketChannel.open();
             server.bind(ip == null ? new InetSocketAddress(port) : new InetSocketAddress(ip, port));
+            InetAddress local = InetAddress.getLocalHost();
+            System.out.println(local.getHostAddress());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -107,7 +110,9 @@ public class SyncServer {
                     for (ClientInfo information : blindMap.keySet()) {
                         blindMap.get(information).add(clientInformation);
                     }
-                    blindMap.put(clientInformation, clientGroup);
+                    List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
+                    list.addAll(clientGroup);
+                    blindMap.put(clientInformation, list);
                 }
                 clientInformation.read();
             } catch (IOException e) {
@@ -144,5 +149,19 @@ public class SyncServer {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    private void connectionClear(){
+        for(ClientInfo key : blindMap.keySet()){
+            for(ClientInfo client : blindMap.get(key)){
+                try {
+                    client.getClient().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            blindMap.remove(key);
+        }
+        clientGroup.clear();
     }
 }

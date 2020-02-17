@@ -12,10 +12,8 @@ import com.thunder_cut.server.data.SendingData;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -71,13 +69,16 @@ public class Process {
     private void message(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
         for (ClientInfo dest : clientMap.get(data.getSrc())) {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
+//            ByteBuffer buffer = ByteBuffer.wrap(sendingData.data);
+//            System.out.println(StandardCharsets.UTF_8.decode(buffer).array());
             write(dest, sendingData);
         }
     }
 
     /**
      * Generate image data and write to all client in client list
-     * @param data this have data, type, src
+     *
+     * @param data      this have data, type, src
      * @param clientMap client list
      */
     private void image(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
@@ -89,6 +90,7 @@ public class Process {
 
     /**
      * Write to client with given data
+     *
      * @param dest client who received data
      * @param data data for write
      */
