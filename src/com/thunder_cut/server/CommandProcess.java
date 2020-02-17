@@ -8,10 +8,7 @@ package com.thunder_cut.server;
 import com.thunder_cut.server.data.Commands;
 import com.thunder_cut.server.data.ReceivedData;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -26,7 +23,7 @@ public class CommandProcess {
     private Consumer<ClientInfo> disconnect;
 
     public CommandProcess(Map<ClientInfo, List<ClientInfo>> clientMap, Consumer<ClientInfo> disconnect) {
-        commandMap = new HashMap<>();
+        commandMap = new EnumMap<Commands, BiConsumer<ReceivedData, String[]>>(Commands.class);
         commandMap.put(Commands.KICK, this::kick);
         commandMap.put(Commands.OP, this::op);
         commandMap.put(Commands.BLIND, this::blind);
