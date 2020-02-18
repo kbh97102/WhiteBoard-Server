@@ -1,4 +1,4 @@
-package com.thunder_cut.server.data;
+package com.thunder_cut.server;
 
 /**
  * This type used to communication, server to client, client to server
@@ -12,9 +12,9 @@ public enum DataType {
         this.type = type;
     }
 
-    public static DataType valueOf(char type) {
+    public static DataType valueOf(char name) {
         for (DataType dataType : DataType.values()) {
-            if (dataType.type == type) {
+            if (dataType.type == name) {
                 return dataType;
             }
         }

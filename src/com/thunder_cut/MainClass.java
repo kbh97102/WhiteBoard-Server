@@ -10,7 +10,6 @@ import com.thunder_cut.server.SyncServer;
 
 public class MainClass {
     public static void main(String[] args) {
-
         SyncServer server;
         if (args.length == 0) {
             server = new SyncServer();
@@ -22,7 +21,6 @@ public class MainClass {
             int port = Integer.parseInt(args[1]);
             server = new SyncServer(ip, port);
         }
-
-        server.run();
+        new Thread(server).start();
     }
 }
