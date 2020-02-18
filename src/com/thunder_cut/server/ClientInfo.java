@@ -6,6 +6,7 @@
 package com.thunder_cut.server;
 
 import com.thunder_cut.server.data.DataType;
+import com.thunder_cut.server.data.ReceivedData;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -85,7 +86,8 @@ public class ClientInfo {
             buffer.flip();
             DataType dataType = DataType.valueOf(type);
             byte[] data = buffer.array();
-            callback.received(this, dataType, data);
+            ReceivedData receivedData = new ReceivedData(this,DataType.valueOf(type),buffer);
+            callback.received(receivedData);
         }
         callback.disconnected(this);
     }

@@ -90,10 +90,11 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     @Override
-    public void received(ClientInfo client, ReceivedData data) {
+    public void received(ReceivedData data) {
         process.getProcessMap().get(DataType.valueOf(data.getDataType().type)).accept(data, clientMap);
     }
 
+    //TODO Resolve Bug (Read Git Issue), When disconnect change client
     /**
      * Remove disconnected client in clientGroup
      * After that change client's ID by ascending sort
