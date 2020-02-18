@@ -7,15 +7,13 @@
 package com.thunder_cut.server;
 
 import com.thunder_cut.server.data.DataType;
+import com.thunder_cut.server.data.ReceivedData;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class is main class about server
@@ -26,6 +24,8 @@ public class SyncServer implements ClientCallback, Runnable {
     private static final int PORT = 3001;
     private ServerSocketChannel server;
     private final List<ClientInfo> clientGroup;
+    private Process process;
+    private final Map<ClientInfo, List<ClientInfo>> clientMap;
 
     /**
      * All IP, Default Port
@@ -55,6 +55,8 @@ public class SyncServer implements ClientCallback, Runnable {
             e.printStackTrace();
         }
         clientGroup = Collections.synchronizedList(new ArrayList<>());
+        process = new Process(this::disconnected);
+        clientMap = new HashMap<>();
     }
 
     /**
@@ -67,66 +69,29 @@ public class SyncServer implements ClientCallback, Runnable {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connected.");
-                ClientInfo clientInformation = new ClientInfo(client, this);
-                clientGroup.add(clientInformation);
-                clientInformation.read();
+                ClientInfo clientInfo = new ClientInfo(client, this, clientGroup.size());
+                clientInfo.setOp(false);
+                synchronized (clientGroup) {
+                    clientGroup.add(clientInfo);
+                }
+                synchronized (clientMap) {
+                    for (ClientInfo information : clientMap.keySet()) {
+                        clientMap.get(information).add(clientInfo);
+                    }
+                    List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
+                    list.addAll(clientGroup);
+                    clientMap.put(clientInfo, list);
+                }
+                clientInfo.read();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    /**
-     * Check dataType and decide writeMode
-     * If type is command, send data to srcID
-     * or write to everyone
-     *
-     * @param src  client who send data
-     * @param type data type
-     * @param data pure data(No header)
-     */
-    private void identifyWriteMode(ClientInfo src, DataType type, byte[] data) {
-        if (type == DataType.CMD) {
-            send(src, type, data, src);
-        } else {
-            send(src, type, data);
-        }
-    }
-
-    /**
-     * Generate with srcID, data type, pure data and Send to a specific client.
-     *
-     * @param src  client who send data
-     * @param type data type
-     * @param data pure data(No header)
-     * @param dest
-     */
-    public void send(ClientInfo src, DataType type, byte[] data, ClientInfo dest) {
-        SendingData sendingData = new SendingData(clientGroup.indexOf(src), clientGroup.indexOf(dest), type, data);
-        try {
-            dest.getClient().write(sendingData.toByteBuffer());
-        } catch (IOException e) {
-            disconnected(dest);
-        }
-    }
-
-    /**
-     * Generate with srcID, data type, pure data and Send to everyone in clientGroup
-     *
-     * @param src  client who send data
-     * @param type data type
-     * @param data pure data(No header)
-     */
-    public void send(ClientInfo src, DataType type, byte[] data) {
-        for (Iterator<ClientInfo> iterator = clientGroup.iterator(); iterator.hasNext(); ) {
-            ClientInfo dest = iterator.next();
-            send(src, type, data, dest);
-        }
-    }
-
     @Override
-    public void received(ClientInfo client, DataType type, byte[] data) {
-        identifyWriteMode(client, type, data);
+    public void received(ClientInfo client, ReceivedData data) {
+        process.getProcessMap().get(DataType.valueOf(data.getDataType().type)).accept(data, clientMap);
     }
 
     /**

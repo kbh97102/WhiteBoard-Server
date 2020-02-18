@@ -6,10 +6,10 @@
 
 package com.thunder_cut.server;
 
-import com.thunder_cut.server.data.DataType;
+import com.thunder_cut.server.data.ReceivedData;
 
 public interface ClientCallback {
-    void received(ClientInfo client, DataType type, byte[] data);
+    void received(ClientInfo client, ReceivedData data);
 
     void disconnected(ClientInfo client);
 }
