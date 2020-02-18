@@ -19,6 +19,7 @@ public class ClientInfo {
     private String name;
     private SocketChannel client;
     private ClientCallback callback;
+    private boolean op;
 
     public ClientInfo(SocketChannel client, ClientCallback callback, int ID) {
         this.client = client;
@@ -37,6 +38,19 @@ public class ClientInfo {
     public String getName(){
         return name;
     }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isOp() {
+        return op;
+    }
+
+    public void setOp(boolean op) {
+        this.op = op;
+    }
+
     /**
      * 1. Allocate ByteBuffer with header size and read header
      * 2. Figure out data type, data size and allocate ByteBuffer with data size
