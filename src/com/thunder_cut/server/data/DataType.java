@@ -1,4 +1,4 @@
-package com.thunder_cut.server;
+package com.thunder_cut.server.data;
 
 /**
  * This type used to communication, server to client, client to server

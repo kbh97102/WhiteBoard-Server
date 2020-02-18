@@ -6,6 +6,8 @@
 
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.data.DataType;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
@@ -23,7 +25,7 @@ import java.util.List;
 public class SyncServer implements ClientCallback, Runnable {
     private static final int PORT = 3001;
     private ServerSocketChannel server;
-    private final List<ClientInformation> clientGroup;
+    private final List<ClientInfo> clientGroup;
 
     /**
      * All IP, Default Port
@@ -56,7 +58,7 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     /**
-     * Detect client connection and Generate ClientInformation with connected client
+     * Detect client connection and Generate ClientInfo with connected client
      * After Generating Add clientGroup and start readingData from client
      */
     @Override
@@ -65,7 +67,7 @@ public class SyncServer implements ClientCallback, Runnable {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connected.");
-                ClientInformation clientInformation = new ClientInformation(client, this);
+                ClientInfo clientInformation = new ClientInfo(client, this);
                 clientGroup.add(clientInformation);
                 clientInformation.read();
             } catch (IOException e) {
@@ -83,7 +85,7 @@ public class SyncServer implements ClientCallback, Runnable {
      * @param type data type
      * @param data pure data(No header)
      */
-    private void identifyWriteMode(ClientInformation src, DataType type, byte[] data) {
+    private void identifyWriteMode(ClientInfo src, DataType type, byte[] data) {
         if (type == DataType.CMD) {
             send(src, type, data, src);
         } else {
@@ -99,7 +101,7 @@ public class SyncServer implements ClientCallback, Runnable {
      * @param data pure data(No header)
      * @param dest
      */
-    public void send(ClientInformation src, DataType type, byte[] data, ClientInformation dest) {
+    public void send(ClientInfo src, DataType type, byte[] data, ClientInfo dest) {
         SendingData sendingData = new SendingData(clientGroup.indexOf(src), clientGroup.indexOf(dest), type, data);
         try {
             dest.getClient().write(sendingData.toByteBuffer());
@@ -115,15 +117,15 @@ public class SyncServer implements ClientCallback, Runnable {
      * @param type data type
      * @param data pure data(No header)
      */
-    public void send(ClientInformation src, DataType type, byte[] data) {
-        for (Iterator<ClientInformation> iterator = clientGroup.iterator(); iterator.hasNext(); ) {
-            ClientInformation dest = iterator.next();
+    public void send(ClientInfo src, DataType type, byte[] data) {
+        for (Iterator<ClientInfo> iterator = clientGroup.iterator(); iterator.hasNext(); ) {
+            ClientInfo dest = iterator.next();
             send(src, type, data, dest);
         }
     }
 
     @Override
-    public void received(ClientInformation client, DataType type, byte[] data) {
+    public void received(ClientInfo client, DataType type, byte[] data) {
         identifyWriteMode(client, type, data);
     }
 
@@ -134,7 +136,7 @@ public class SyncServer implements ClientCallback, Runnable {
      * @param client disconnected client
      */
     @Override
-    public void disconnected(ClientInformation client) {
+    public void disconnected(ClientInfo client) {
         try {
             System.out.println(client.getClient().getRemoteAddress() + " is disconnected.");
             client.getClient().close();

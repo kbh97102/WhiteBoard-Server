@@ -1,9 +1,11 @@
 /*
- * ClientInformation.java
+ * ClientInfo.java
  * Author : Arakene
  * Created Date : 2020-02-04
  */
 package com.thunder_cut.server;
+
+import com.thunder_cut.server.data.DataType;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,11 +14,11 @@ import java.nio.channels.SocketChannel;
 /**
  * This class has information, read and write about connected client
  */
-public class ClientInformation {
+public class ClientInfo {
     private SocketChannel client;
     private ClientCallback callback;
 
-    public ClientInformation(SocketChannel client, ClientCallback callback) {
+    public ClientInfo(SocketChannel client, ClientCallback callback) {
         this.client = client;
         this.callback = callback;
     }
