@@ -118,4 +118,18 @@ public class SyncServer implements ClientCallback, Runnable {
             e.printStackTrace();
         }
     }
+
+    private void connectionClear(){
+        for(ClientInfo key : clientMap.keySet()){
+            for(ClientInfo client : clientMap.get(key)){
+                try {
+                    client.getClient().close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            clientMap.remove(key);
+        }
+        clientGroup.clear();
+    }
 }
