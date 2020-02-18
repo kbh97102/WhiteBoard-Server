@@ -108,6 +108,12 @@ public class SyncServer implements ClientCallback, Runnable {
             synchronized (clientGroup) {
                 clientGroup.remove(client);
             }
+            synchronized (clientMap) {
+                clientMap.remove(client);
+                for (ClientInfo information : clientMap.keySet()) {
+                    clientMap.get(information).remove(client);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
