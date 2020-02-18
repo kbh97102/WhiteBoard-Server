@@ -15,12 +15,15 @@ import java.nio.channels.SocketChannel;
  * This class has information, read and write about connected client
  */
 public class ClientInfo {
+    public int ID;
+    private String name;
     private SocketChannel client;
     private ClientCallback callback;
 
-    public ClientInfo(SocketChannel client, ClientCallback callback) {
+    public ClientInfo(SocketChannel client, ClientCallback callback, int ID) {
         this.client = client;
         this.callback = callback;
+        this.ID = ID;
     }
 
     public SocketChannel getClient() {
@@ -31,6 +34,9 @@ public class ClientInfo {
         new Thread(this::reading).start();
     }
 
+    public String getName(){
+        return name;
+    }
     /**
      * 1. Allocate ByteBuffer with header size and read header
      * 2. Figure out data type, data size and allocate ByteBuffer with data size
