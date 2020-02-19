@@ -81,6 +81,7 @@ public class SyncServer implements ClientCallback, Runnable {
                     List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
                     list.addAll(clientGroup);
                     clientMap.put(clientInfo, list);
+
                 }
                 clientInfo.read();
             } catch (IOException e) {
@@ -95,6 +96,7 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     //TODO Resolve Bug (Read Git Issue), When disconnect change client
+
     /**
      * Remove disconnected client in clientGroup
      * After that change client's ID by ascending sort
@@ -111,18 +113,29 @@ public class SyncServer implements ClientCallback, Runnable {
             }
             synchronized (clientMap) {
                 clientMap.remove(client);
-                for (ClientInfo information : clientMap.keySet()) {
-                    clientMap.get(information).remove(client);
-                }
+                changeAllID();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void connectionClear(){
-        for(ClientInfo key : clientMap.keySet()){
-            for(ClientInfo client : clientMap.get(key)){
+    private void changeAllID() {
+        int newIndex = 0;
+        for (ClientInfo info : clientGroup) {
+            info.ID = newIndex++;
+        }
+        List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
+        list.addAll(clientGroup);
+        for (ClientInfo key : clientMap.keySet()) {
+            clientMap.get(key).clear();
+            clientMap.get(key).addAll(list);
+        }
+    }
+
+    private void connectionClear() {
+        for (ClientInfo key : clientMap.keySet()) {
+            for (ClientInfo client : clientMap.get(key)) {
                 try {
                     client.getClient().close();
                 } catch (IOException e) {
