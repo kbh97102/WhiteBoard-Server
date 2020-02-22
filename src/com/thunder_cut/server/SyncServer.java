@@ -48,6 +48,7 @@ public class SyncServer implements ClientCallback, Runnable {
      */
     public SyncServer(String ip, int port) {
         try {
+
             server = ServerSocketChannel.open();
             server.bind(ip == null ? new InetSocketAddress(port) : new InetSocketAddress(ip, port));
         } catch (IOException e) {
