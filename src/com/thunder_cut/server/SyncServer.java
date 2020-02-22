@@ -120,15 +120,13 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     private void changeAllID() {
-        List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
-        list.addAll(clientGroup);
         for (ClientInfo key : clientMap.keySet()) {
             clientMap.get(key).clear();
-            clientMap.get(key).addAll(list);
+            clientMap.get(key).addAll(clientGroup);
         }
     }
 
-    private void connectionClear() {
+    private void clearConnection() {
         for (ClientInfo key : clientMap.keySet()) {
             for (ClientInfo client : clientMap.get(key)) {
                 try {
