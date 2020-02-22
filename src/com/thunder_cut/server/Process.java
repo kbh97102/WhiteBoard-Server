@@ -66,6 +66,11 @@ public class Process {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
             write(dest, sendingData);
         }
+        for(int i=0;i<clientMap.get(data.getSrc()).size();i++){
+            ClientInformation destination = clientMap.get(data.getSrc()).get(i);
+            SendingData sendingData = new SendingData(data.getSrc(), destination, data.getDataType(), data.getBuffer().array());
+            write(destination, sendingData);
+        }
     }
 
     /**

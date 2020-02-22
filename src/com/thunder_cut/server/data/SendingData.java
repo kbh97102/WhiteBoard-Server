@@ -15,18 +15,18 @@ import java.nio.ByteBuffer;
 public class SendingData {
 
     public final DataType dataType;
-    public final ClientInformation src;
-    public final ClientInformation dest;
+    public final int srcID;
+    public final int destID;
     public final byte[] data;
 
-    public SendingData(ClientInformation src, ClientInformation dest, DataType dataType, byte[] data) {
-        this.src = src;
-        this.dest = dest;
+    public SendingData(int srcID, int destID, DataType dataType, byte[] data) {
+        this.srcID = srcID;
+        this.destID = destID;
         this.dataType = dataType;
         this.data = data;
     }
 
-    public ByteBuffer generateDataByType() {
+    public ByteBuffer generateDataByType(ClientInformation src) {
         if (dataType == DataType.MSG) {
             return toByteBuffer(src.getName());
         } else {
@@ -43,8 +43,8 @@ public class SendingData {
     private ByteBuffer toByteBuffer() {
         ByteBuffer buffer = ByteBuffer.allocate(data.length + 14);
         buffer.putChar(dataType.type);
-        buffer.putInt(src.ID);
-        buffer.putInt(dest.ID);
+        buffer.putInt(srcID);
+        buffer.putInt(destID);
         buffer.putInt(data.length);
         buffer.put(data);
         buffer.flip();
@@ -57,8 +57,8 @@ public class SendingData {
         String nickName = name.concat("::");
         ByteBuffer buffer = ByteBuffer.allocate(data.length + 14 + nickName.getBytes().length);
         buffer.putChar(dataType.type);
-        buffer.putInt(src.ID);
-        buffer.putInt(dest.ID);
+        buffer.putInt(srcID);
+        buffer.putInt(destID);
         int dataSize = data.length + nickName.length();
         buffer.putInt(dataSize);
         buffer.put(nickName.getBytes());
@@ -68,7 +68,4 @@ public class SendingData {
         return buffer;
     }
 
-    public ClientInformation getDest() {
-        return dest;
-    }
 }
