@@ -5,6 +5,9 @@
  */
 package com.thunder_cut.server;
 
+import com.thunder_cut.server.data.DataType;
+import com.thunder_cut.server.data.ReceivedData;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -13,12 +16,15 @@ import java.nio.channels.SocketChannel;
  * This class has information, read and write about connected client
  */
 public class ClientInformation {
+    private String name;
     private SocketChannel client;
     private ClientCallback callback;
+    private boolean op;
 
     public ClientInformation(SocketChannel client, ClientCallback callback) {
         this.client = client;
         this.callback = callback;
+        op = false;
     }
 
     public SocketChannel getClient() {
@@ -27,6 +33,22 @@ public class ClientInformation {
 
     public void read() {
         new Thread(this::reading).start();
+    }
+
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isOp() {
+        return op;
+    }
+
+    public void setOp(boolean op) {
+        this.op = op;
     }
 
     /**
@@ -63,7 +85,8 @@ public class ClientInformation {
             buffer.flip();
             DataType dataType = DataType.valueOf(type);
             byte[] data = buffer.array();
-            callback.received(this, dataType, data);
+            ReceivedData receivedData = new ReceivedData(this,DataType.valueOf(type),buffer);
+            callback.received(receivedData);
         }
         callback.disconnected(this);
     }
