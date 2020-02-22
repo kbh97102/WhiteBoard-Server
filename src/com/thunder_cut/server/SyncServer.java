@@ -23,9 +23,9 @@ import java.util.*;
 public class SyncServer implements ClientCallback, Runnable {
     private static final int PORT = 3001;
     private ServerSocketChannel server;
-    private final List<ClientInfo> clientGroup;
+    private final List<ClientInformation> clientGroup;
     private Process process;
-    private final Map<ClientInfo, List<ClientInfo>> clientMap;
+    private final Map<ClientInformation, List<ClientInformation>> clientMap;
 
     /**
      * All IP, Default Port
@@ -60,7 +60,7 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     /**
-     * Detect client connection and Generate ClientInfo with connected client
+     * Detect client connection and Generate ClientInformation with connected client
      * After Generating Add clientGroup and start readingData from client
      */
     @Override
@@ -69,15 +69,15 @@ public class SyncServer implements ClientCallback, Runnable {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connected.");
-                ClientInfo clientInfo = new ClientInfo(client, this);
+                ClientInformation clientInfo = new ClientInformation(client, this);
                 synchronized (clientGroup) {
                     clientGroup.add(clientInfo);
                 }
                 synchronized (clientMap) {
-                    for (ClientInfo information : clientMap.keySet()) {
+                    for (ClientInformation information : clientMap.keySet()) {
                         clientMap.get(information).add(clientInfo);
                     }
-                    List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
+                    List<ClientInformation> list = Collections.synchronizedList(new ArrayList<>());
                     list.addAll(clientGroup);
                     clientMap.put(clientInfo, list);
 
@@ -103,7 +103,7 @@ public class SyncServer implements ClientCallback, Runnable {
      * @param client disconnected client
      */
     @Override
-    public void disconnected(ClientInfo client) {
+    public void disconnected(ClientInformation client) {
         try {
             System.out.println(client.getClient().getRemoteAddress() + " is disconnected.");
             client.getClient().close();
@@ -120,15 +120,15 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     private void changeAllID() {
-        for (ClientInfo key : clientMap.keySet()) {
+        for (ClientInformation key : clientMap.keySet()) {
             clientMap.get(key).clear();
             clientMap.get(key).addAll(clientGroup);
         }
     }
 
     private void clearConnection() {
-        for (ClientInfo key : clientMap.keySet()) {
-            for (ClientInfo client : clientMap.get(key)) {
+        for (ClientInformation key : clientMap.keySet()) {
+            for (ClientInformation client : clientMap.get(key)) {
                 try {
                     client.getClient().close();
                 } catch (IOException e) {

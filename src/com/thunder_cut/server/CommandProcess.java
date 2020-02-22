@@ -19,10 +19,10 @@ public class CommandProcess {
 
 
     private Map<CommandType, BiConsumer<ReceivedData, String[]>> commandMap;
-    private Map<ClientInfo, List<ClientInfo>> clientMap;
-    private Consumer<ClientInfo> disconnect;
+    private Map<ClientInformation, List<ClientInformation>> clientMap;
+    private Consumer<ClientInformation> disconnect;
 
-    public CommandProcess(Map<ClientInfo, List<ClientInfo>> clientMap, Consumer<ClientInfo> disconnect) {
+    public CommandProcess(Map<ClientInformation, List<ClientInformation>> clientMap, Consumer<ClientInformation> disconnect) {
         commandMap = new EnumMap<CommandType, BiConsumer<ReceivedData, String[]>>(CommandType.class);
         commandMap.put(CommandType.KICK, this::kick);
         commandMap.put(CommandType.OP, this::op);
@@ -64,7 +64,7 @@ public class CommandProcess {
      * @param tokens split command
      */
     private void blind(ReceivedData data, String[] tokens) {
-        for (ClientInfo key : clientMap.keySet()) {
+        for (ClientInformation key : clientMap.keySet()) {
             if (!clientMap.get(key).contains(data.getSrc())) {
                 clientMap.get(key).add(data.getSrc());
             } else {
@@ -82,7 +82,7 @@ public class CommandProcess {
      * @param tokens split command
      */
     private void ignore(ReceivedData data, String[] tokens) {
-        ClientInfo dest = getDest(tokens[1]);
+        ClientInformation dest = getDest(tokens[1]);
         if (!clientMap.get(data.getSrc()).contains(dest)) {
             clientMap.get(data.getSrc()).add(dest);
         } else {
@@ -96,9 +96,9 @@ public class CommandProcess {
      * @param clientName client's name
      * @return clientinfo that include clientName
      */
-    private ClientInfo getDest(String clientName) {
-        for (List<ClientInfo> list : clientMap.values()) {
-            for (ClientInfo client : list) {
+    private ClientInformation getDest(String clientName) {
+        for (List<ClientInformation> list : clientMap.values()) {
+            for (ClientInformation client : list) {
                 if (client.getName().equals(clientName)) {
                     return client;
                 }

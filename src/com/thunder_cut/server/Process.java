@@ -22,11 +22,11 @@ import java.util.function.Consumer;
  */
 public class Process {
 
-    private Map<DataType, BiConsumer<ReceivedData, Map<ClientInfo, List<ClientInfo>>>> processMap;
-    private Consumer<ClientInfo> disconnect;
+    private Map<DataType, BiConsumer<ReceivedData, Map<ClientInformation, List<ClientInformation>>>> processMap;
+    private Consumer<ClientInformation> disconnect;
 
-    public Process(Consumer<ClientInfo> disconnect) {
-        processMap = new EnumMap<DataType, BiConsumer<ReceivedData, Map<ClientInfo, List<ClientInfo>>>>(DataType.class);
+    public Process(Consumer<ClientInformation> disconnect) {
+        processMap = new EnumMap<DataType, BiConsumer<ReceivedData, Map<ClientInformation, List<ClientInformation>>>>(DataType.class);
         processMap.put(DataType.CMD, this::command);
         processMap.put(DataType.MSG, this::message);
         processMap.put(DataType.IMG, this::image);
@@ -40,7 +40,7 @@ public class Process {
      * @param data      this have data, type, src
      * @param clientMap client list
      */
-    private void command(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
+    private void command(ReceivedData data, Map<ClientInformation, List<ClientInformation>> clientMap) {
         ByteBuffer buffer = data.getBuffer();
         buffer.flip();
         String command = new String(buffer.array(), StandardCharsets.UTF_8);
@@ -66,8 +66,8 @@ public class Process {
      * @param data      this have data, type, src
      * @param clientMap client list
      */
-    private void message(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
-        for (ClientInfo dest : clientMap.get(data.getSrc())) {
+    private void message(ReceivedData data, Map<ClientInformation, List<ClientInformation>> clientMap) {
+        for (ClientInformation dest : clientMap.get(data.getSrc())) {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
             write(dest, sendingData);
         }
@@ -79,8 +79,8 @@ public class Process {
      * @param data      this have data, type, src
      * @param clientMap client list
      */
-    private void image(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
-        for (ClientInfo dest : clientMap.get(data.getSrc())) {
+    private void image(ReceivedData data, Map<ClientInformation, List<ClientInformation>> clientMap) {
+        for (ClientInformation dest : clientMap.get(data.getSrc())) {
             SendingData sendingData = new SendingData(data.getSrc(), dest, data.getDataType(), data.getBuffer().array());
             write(dest, sendingData);
         }
@@ -92,7 +92,7 @@ public class Process {
      * @param dest client who received data
      * @param data data for write
      */
-    private synchronized void write(ClientInfo dest, SendingData data) {
+    private synchronized void write(ClientInformation dest, SendingData data) {
         try {
             dest.getClient().write(data.identifyType());
         } catch (IOException | NullPointerException e) {
@@ -100,7 +100,7 @@ public class Process {
         }
     }
 
-    public Map<DataType, BiConsumer<ReceivedData, Map<ClientInfo, List<ClientInfo>>>> getProcessMap() {
+    public Map<DataType, BiConsumer<ReceivedData, Map<ClientInformation, List<ClientInformation>>>> getProcessMap() {
         return processMap;
     }
 }

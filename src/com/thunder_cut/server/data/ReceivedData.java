@@ -5,7 +5,7 @@
  */
 package com.thunder_cut.server.data;
 
-import com.thunder_cut.server.ClientInfo;
+import com.thunder_cut.server.ClientInformation;
 
 import java.nio.ByteBuffer;
 
@@ -13,15 +13,15 @@ public class ReceivedData {
 
     private DataType dataType;
     private ByteBuffer buffer;
-    private ClientInfo src;
+    private ClientInformation src;
 
-    public ReceivedData(ClientInfo src, DataType dataType, ByteBuffer buffer) {
+    public ReceivedData(ClientInformation src, DataType dataType, ByteBuffer buffer) {
         this.src = src;
         this.dataType = dataType;
         this.buffer = buffer;
     }
 
-    public ClientInfo getSrc() {
+    public ClientInformation getSrc() {
         return src;
     }
 

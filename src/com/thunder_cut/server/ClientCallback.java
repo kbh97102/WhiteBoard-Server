@@ -11,5 +11,5 @@ import com.thunder_cut.server.data.ReceivedData;
 public interface ClientCallback {
     void received(ReceivedData data);
 
-    void disconnected(ClientInfo client);
+    void disconnected(ClientInformation client);
 }
