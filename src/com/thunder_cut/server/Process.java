@@ -12,6 +12,7 @@ import com.thunder_cut.server.data.SendingData;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -42,7 +43,7 @@ public class Process {
     private void command(ReceivedData data, Map<ClientInfo, List<ClientInfo>> clientMap) {
         ByteBuffer buffer = data.getBuffer();
         buffer.flip();
-        String command = new String(buffer.array());
+        String command = new String(buffer.array(), StandardCharsets.UTF_8);
         String[] commandToken = new String[3];
         StringTokenizer stringTokenizer = new StringTokenizer(command, " ");
         int index = 0;
