@@ -26,7 +26,7 @@ public class SendingData {
         this.data = data;
     }
 
-    public ByteBuffer identifyType() {
+    public ByteBuffer generateDataByType() {
         if (dataType == DataType.MSG) {
             return toByteBuffer(src.getName());
         } else {
