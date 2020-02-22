@@ -25,6 +25,7 @@ public class SyncServer implements ClientCallback, Runnable {
     private final List<ClientInformation> clientGroup;
     private Process process;
     private final Map<ClientInformation, List<ClientInformation>> clientMap;
+    private CheckIP checkIP;
 
     /**
      * All IP, Default Port
@@ -57,6 +58,7 @@ public class SyncServer implements ClientCallback, Runnable {
         clientGroup = Collections.synchronizedList(new ArrayList<>());
         process = new Process(this::disconnected);
         clientMap = new HashMap<>();
+        checkIP = new CheckIP();
     }
 
     /**
@@ -68,6 +70,11 @@ public class SyncServer implements ClientCallback, Runnable {
         while (true) {
             try {
                 SocketChannel client = server.accept();
+                InetSocketAddress socketAddress = (InetSocketAddress) client.getRemoteAddress();
+                if(checkIP.isBlackIP(socketAddress.getHostName())){
+                    client.close();
+                    return;
+                }
                 System.out.println(client.getRemoteAddress() + " is connected.");
                 ClientInformation clientInfo = new ClientInformation(client, this);
 
