@@ -5,7 +5,7 @@
  */
 package com.thunder_cut.server;
 
-import com.thunder_cut.server.data.Commands;
+import com.thunder_cut.server.data.CommandType;
 import com.thunder_cut.server.data.DataType;
 import com.thunder_cut.server.data.ReceivedData;
 import com.thunder_cut.server.data.SendingData;
@@ -51,7 +51,7 @@ public class Process {
         }
         CommandProcess commandProcess = new CommandProcess(clientMap, disconnect);
         try {
-            commandProcess.getCommandMap().get(Commands.acceptable(commandToken[0], data.getSrc().isOp())).accept(data, commandToken);
+            commandProcess.getCommandMap().get(CommandType.acceptable(commandToken[0], data.getSrc().isOp())).accept(data, commandToken);
         } catch (NullPointerException e) {
             String errorMessage = "Error! Given command do not exist";
             SendingData error = new SendingData(data.getSrc(), data.getSrc(), DataType.MSG, errorMessage.getBytes());

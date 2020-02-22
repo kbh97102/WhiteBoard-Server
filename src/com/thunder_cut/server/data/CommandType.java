@@ -8,7 +8,7 @@ package com.thunder_cut.server.data;
  * <p>
  * kick, op --> 서버의 권한
  */
-public enum Commands {
+public enum CommandType {
 
     SET_NAME("/set_name", false),
     KICK("/kick", true),
@@ -20,32 +20,32 @@ public enum Commands {
     public final boolean op;
 
 
-    Commands(String s, boolean b) {
+    CommandType(String s, boolean b) {
         this.command = s;
         this.op = b;
     }
 
-    private Commands getCommand(String type){
-        for(Commands commands : Commands.values()){
-            if(commands.command.equals(type)){
-                return commands;
+    private CommandType getCommand(String type){
+        for(CommandType commandType : CommandType.values()){
+            if(commandType.command.equals(type)){
+                return commandType;
             }
         }
         return null;
     }
 
-    public static Commands acceptable(String type, boolean op){
+    public static CommandType acceptable(String type, boolean op){
         if (!op){
-            for(Commands commands : Commands.values()){
-                if(commands.command.equals(type) && !commands.op){
-                    return commands;
+            for(CommandType commandType : CommandType.values()){
+                if(commandType.command.equals(type) && !commandType.op){
+                    return commandType;
                 }
             }
         }
         else{
-            for(Commands commands : Commands.values()){
-                if(commands.command.equals(type)){
-                    return commands;
+            for(CommandType commandType : CommandType.values()){
+                if(commandType.command.equals(type)){
+                    return commandType;
                 }
             }
         }

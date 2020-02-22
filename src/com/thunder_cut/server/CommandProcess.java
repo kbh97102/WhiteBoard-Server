@@ -5,7 +5,7 @@
  */
 package com.thunder_cut.server;
 
-import com.thunder_cut.server.data.Commands;
+import com.thunder_cut.server.data.CommandType;
 import com.thunder_cut.server.data.ReceivedData;
 
 import java.util.*;
@@ -18,17 +18,17 @@ import java.util.function.Consumer;
 public class CommandProcess {
 
 
-    private Map<Commands, BiConsumer<ReceivedData, String[]>> commandMap;
+    private Map<CommandType, BiConsumer<ReceivedData, String[]>> commandMap;
     private Map<ClientInfo, List<ClientInfo>> clientMap;
     private Consumer<ClientInfo> disconnect;
 
     public CommandProcess(Map<ClientInfo, List<ClientInfo>> clientMap, Consumer<ClientInfo> disconnect) {
-        commandMap = new EnumMap<Commands, BiConsumer<ReceivedData, String[]>>(Commands.class);
-        commandMap.put(Commands.KICK, this::kick);
-        commandMap.put(Commands.OP, this::op);
-        commandMap.put(Commands.BLIND, this::blind);
-        commandMap.put(Commands.IGNORE, this::ignore);
-        commandMap.put(Commands.SET_NAME, this::setName);
+        commandMap = new EnumMap<CommandType, BiConsumer<ReceivedData, String[]>>(CommandType.class);
+        commandMap.put(CommandType.KICK, this::kick);
+        commandMap.put(CommandType.OP, this::op);
+        commandMap.put(CommandType.BLIND, this::blind);
+        commandMap.put(CommandType.IGNORE, this::ignore);
+        commandMap.put(CommandType.SET_NAME, this::setName);
         this.clientMap = clientMap;
         this.disconnect = disconnect;
     }
@@ -107,7 +107,7 @@ public class CommandProcess {
         return null;
     }
 
-    public Map<Commands, BiConsumer<ReceivedData, String[]>> getCommandMap() {
+    public Map<CommandType, BiConsumer<ReceivedData, String[]>> getCommandMap() {
         return commandMap;
     }
 
