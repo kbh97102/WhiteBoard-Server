@@ -107,6 +107,7 @@ public class SyncServer implements ClientCallback, Runnable {
             }
             synchronized (clientMap) {
                 clientMap.remove(client);
+
                 changeClientList();
             }
         } catch (Exception e) {
