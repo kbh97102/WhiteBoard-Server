@@ -91,7 +91,7 @@ public class SyncServer implements ClientCallback, Runnable {
 
     @Override
     public void received(ReceivedData data) {
-        process.getProcessMap().get(DataType.valueOf(data.getDataType().type)).accept(data, clientMap);
+        process.processWithType(data, clientMap);
     }
 
     //TODO Resolve Bug (Read Git Issue), When disconnect change client

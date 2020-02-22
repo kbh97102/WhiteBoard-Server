@@ -22,14 +22,9 @@ import java.util.function.Consumer;
  */
 public class Process {
 
-    private Map<DataType, BiConsumer<ReceivedData, Map<ClientInformation, List<ClientInformation>>>> processMap;
     private Consumer<ClientInformation> disconnect;
 
     public Process(Consumer<ClientInformation> disconnect) {
-        processMap = new EnumMap<DataType, BiConsumer<ReceivedData, Map<ClientInformation, List<ClientInformation>>>>(DataType.class);
-        processMap.put(DataType.CMD, this::command);
-        processMap.put(DataType.MSG, this::message);
-        processMap.put(DataType.IMG, this::image);
         this.disconnect = disconnect;
     }
 
@@ -100,7 +95,15 @@ public class Process {
         }
     }
 
-    public Map<DataType, BiConsumer<ReceivedData, Map<ClientInformation, List<ClientInformation>>>> getProcessMap() {
-        return processMap;
+    public void processWithType(ReceivedData data, Map<ClientInformation, List<ClientInformation>> clientMap){
+        if(data.getDataType().equals(DataType.MSG)){
+            message(data, clientMap);
+        }
+        else if(data.getDataType().equals(DataType.IMG)){
+            image(data, clientMap);
+        }
+        else{
+            command(data, clientMap);
+        }
     }
 }
