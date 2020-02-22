@@ -13,9 +13,7 @@ import com.thunder_cut.server.data.SendingData;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -75,15 +73,27 @@ public class Process {
      * @param clientMap client list
      */
     private void notCommand(ReceivedData data, Map<ClientInformation, List<ClientInformation>> clientMap) {
-        int srcIndex = 0;
         for (int index = 0; index < clientMap.get(data.getSrc()).size(); index++) {
             ClientInformation destination = clientMap.get(data.getSrc()).get(index);
-            if (data.getSrc() == destination) {
-                srcIndex = index;
-            }
-            SendingData sendingData = new SendingData(srcIndex, index, data.getDataType(), data.getBuffer().array());
+            int[] IDs = findID(data.getSrc(), destination, clientMap);
+            SendingData sendingData = new SendingData(IDs[0], IDs[1], data.getDataType(), data.getBuffer().array());
             write(data.getSrc(), destination, sendingData);
         }
+    }
+
+
+    private int[] findID(ClientInformation src, ClientInformation dest, Map<ClientInformation, List<ClientInformation>> clientMap) {
+        ClientInformation[] clientArr = clientMap.keySet().toArray(ClientInformation[]::new);
+        int[] IDs = new int[2];
+        for (int index = 0; index < clientArr.length; index++) {
+            if (src == clientArr[index]) {
+                IDs[0] = index;
+            }
+            if(dest == clientArr[index]){
+                IDs[1] = index;
+            }
+        }
+        return IDs;
     }
 
     /**
@@ -92,7 +102,7 @@ public class Process {
      * @param dest client who received data
      * @param data data for write
      */
-    private synchronized void write(ClientInformation src,ClientInformation dest, SendingData data) {
+    private synchronized void write(ClientInformation src, ClientInformation dest, SendingData data) {
         try {
             dest.getClient().write(data.generateDataByType(src));
         } catch (IOException | NullPointerException e) {

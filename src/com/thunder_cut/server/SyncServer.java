@@ -6,7 +6,6 @@
 
 package com.thunder_cut.server;
 
-import com.thunder_cut.server.data.DataType;
 import com.thunder_cut.server.data.ReceivedData;
 
 import java.io.IOException;
@@ -70,17 +69,15 @@ public class SyncServer implements ClientCallback, Runnable {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connected.");
                 ClientInformation clientInfo = new ClientInformation(client, this);
-                synchronized (clientGroup) {
-                    clientGroup.add(clientInfo);
-                }
+
                 synchronized (clientMap) {
+                    clientMap.put(clientInfo, clientGroup);
                     for (ClientInformation information : clientMap.keySet()) {
                         clientMap.get(information).add(clientInfo);
                     }
-                    List<ClientInformation> list = Collections.synchronizedList(new ArrayList<>());
-                    list.addAll(clientGroup);
-                    clientMap.put(clientInfo, list);
-
+                }
+                synchronized (clientGroup) {
+                    clientGroup.add(clientInfo);
                 }
                 clientInfo.read();
             } catch (IOException e) {
@@ -93,8 +90,6 @@ public class SyncServer implements ClientCallback, Runnable {
     public void received(ReceivedData data) {
         process.processWithType(data, clientMap);
     }
-
-    //TODO Resolve Bug (Read Git Issue), When disconnect change client
 
     /**
      * Remove disconnected client in clientGroup
@@ -112,14 +107,14 @@ public class SyncServer implements ClientCallback, Runnable {
             }
             synchronized (clientMap) {
                 clientMap.remove(client);
-                changeAllID();
+                changeClientList();
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void changeAllID() {
+    private void changeClientList() {
         for (ClientInformation key : clientMap.keySet()) {
             clientMap.get(key).clear();
             clientMap.get(key).addAll(clientGroup);
