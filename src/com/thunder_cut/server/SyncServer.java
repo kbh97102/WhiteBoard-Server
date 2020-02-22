@@ -69,8 +69,7 @@ public class SyncServer implements ClientCallback, Runnable {
             try {
                 SocketChannel client = server.accept();
                 System.out.println(client.getRemoteAddress() + " is connected.");
-                ClientInfo clientInfo = new ClientInfo(client, this, clientGroup.size());
-                clientInfo.setOp(false);
+                ClientInfo clientInfo = new ClientInfo(client, this);
                 synchronized (clientGroup) {
                     clientGroup.add(clientInfo);
                 }
@@ -121,10 +120,6 @@ public class SyncServer implements ClientCallback, Runnable {
     }
 
     private void changeAllID() {
-        int newIndex = 0;
-        for (ClientInfo info : clientGroup) {
-            info.ID = newIndex++;
-        }
         List<ClientInfo> list = Collections.synchronizedList(new ArrayList<>());
         list.addAll(clientGroup);
         for (ClientInfo key : clientMap.keySet()) {

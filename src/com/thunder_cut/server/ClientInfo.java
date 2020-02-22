@@ -16,16 +16,15 @@ import java.nio.channels.SocketChannel;
  * This class has information, read and write about connected client
  */
 public class ClientInfo {
-    public int ID;
     private String name;
     private SocketChannel client;
     private ClientCallback callback;
     private boolean op;
 
-    public ClientInfo(SocketChannel client, ClientCallback callback, int ID) {
+    public ClientInfo(SocketChannel client, ClientCallback callback) {
         this.client = client;
         this.callback = callback;
-        this.ID = ID;
+        op = false;
     }
 
     public SocketChannel getClient() {
