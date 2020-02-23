@@ -73,7 +73,7 @@ public class SyncServer implements ClientCallback, Runnable {
                 InetSocketAddress socketAddress = (InetSocketAddress) client.getRemoteAddress();
                 if (checkIP.isBlackIP(socketAddress.getHostName())) {
                     client.close();
-                    return;
+                    continue;
                 }
                 System.out.println(client.getRemoteAddress() + " is connected.");
                 ClientInformation clientInfo = new ClientInformation(client, this);

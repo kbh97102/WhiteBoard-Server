@@ -22,6 +22,5 @@ public class MainClass {
             server = new SyncServer(ip, port);
         }
         new Thread(server).start();
-
     }
 }
