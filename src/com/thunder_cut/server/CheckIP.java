@@ -13,7 +13,11 @@ public class CheckIP {
     private BufferedReader bufferedReader;
 
     public CheckIP() {
+        File blackListFile = new File(FILEPATH);
         try {
+            if(!blackListFile.exists()){
+                generateBlackList();
+            }
             bufferedReader = new BufferedReader(new FileReader(FILEPATH));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -38,6 +42,14 @@ public class CheckIP {
             catch (IOException e){
                 e.printStackTrace();
             }
+        }
+    }
+
+    private void generateBlackList(){
+        try{
+            addBlackList("This file has Black IP");
+        }
+        catch (IOException ignored){
         }
     }
 
