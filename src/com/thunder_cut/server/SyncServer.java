@@ -71,7 +71,7 @@ public class SyncServer implements ClientCallback, Runnable {
             try {
                 SocketChannel client = server.accept();
                 InetSocketAddress socketAddress = (InetSocketAddress) client.getRemoteAddress();
-                if(checkIP.isBlackIP(socketAddress.getHostName())){
+                if (checkIP.isBlackIP(socketAddress.getHostName())) {
                     client.close();
                     return;
                 }
@@ -79,7 +79,8 @@ public class SyncServer implements ClientCallback, Runnable {
                 ClientInformation clientInfo = new ClientInformation(client, this);
 
                 synchronized (clientMap) {
-                    clientMap.put(clientInfo, clientGroup);
+                    clientMap.put(clientInfo, Collections.synchronizedList(new ArrayList<>()));
+                    clientMap.get(clientInfo).addAll(clientGroup);
                     for (ClientInformation information : clientMap.keySet()) {
                         clientMap.get(information).add(clientInfo);
                     }

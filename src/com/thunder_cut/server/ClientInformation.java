@@ -35,7 +35,7 @@ public class ClientInformation {
         new Thread(this::reading).start();
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 
@@ -85,7 +85,7 @@ public class ClientInformation {
             buffer.flip();
             DataType dataType = DataType.valueOf(type);
             byte[] data = buffer.array();
-            ReceivedData receivedData = new ReceivedData(this,DataType.valueOf(type),buffer);
+            ReceivedData receivedData = new ReceivedData(this, DataType.valueOf(type), buffer);
             callback.received(receivedData);
         }
         callback.disconnected(this);

@@ -8,10 +8,6 @@ package com.thunder_cut;
 
 import com.thunder_cut.server.SyncServer;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 public class MainClass {
     public static void main(String[] args) {
         SyncServer server;

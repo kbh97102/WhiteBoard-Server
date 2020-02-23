@@ -49,6 +49,7 @@ public class SendingData {
         buffer.put(data);
         buffer.flip();
 
+        System.out.println("Src : "+srcID+" dest : "+destID);
 
         return buffer;
     }

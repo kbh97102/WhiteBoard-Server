@@ -13,7 +13,9 @@ import com.thunder_cut.server.data.SendingData;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 import java.util.function.Consumer;
 
 /**
@@ -89,7 +91,7 @@ public class Process {
             if (src == clientArr[index]) {
                 IDs[0] = index;
             }
-            if(dest == clientArr[index]){
+            if (dest == clientArr[index]) {
                 IDs[1] = index;
             }
         }
