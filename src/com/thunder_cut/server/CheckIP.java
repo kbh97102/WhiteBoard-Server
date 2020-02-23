@@ -5,57 +5,79 @@
  */
 package com.thunder_cut.server;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.InetSocketAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 public class CheckIP {
 
     private static final String FILEPATH = "BlackList.txt";
-    private BufferedReader bufferedReader;
+    private List<String> blackList;
+    private List<InetSocketAddress> blackListBuffer;
 
     public CheckIP() {
         File blackListFile = new File(FILEPATH);
+        if (!blackListFile.exists()) {
+            generateBlackListFile();
+        }
+        setBlackList();
+        blackListBuffer = Collections.synchronizedList(new ArrayList<>());
+    }
+
+    private void setBlackList() {
+        blackList = Collections.synchronizedList(new ArrayList<>());
         try {
-            if(!blackListFile.exists()){
-                generateBlackList();
-            }
-            bufferedReader = new BufferedReader(new FileReader(FILEPATH));
-        } catch (FileNotFoundException e) {
+            Path path = Paths.get(FILEPATH);
+            blackList = Files.readAllLines(path);
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public boolean isBlackIP(String IP) {
-        while(true){
-            try{
-                String savedIP = bufferedReader.readLine();
-                if(savedIP == null){
-                    return false;
-                }
-                if(savedIP.equals(IP)){
-                    addBlackList(IP);
-                    return true;
-                }
-                else{
-                    return false;
-                }
-            }
-            catch (IOException e){
-                e.printStackTrace();
-            }
+    private void generateBlackListFile() {
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(FILEPATH));
+            printWriter.println("This file has Black IP");
+            printWriter.close();
+        } catch (IOException ignored) {
         }
     }
 
-    private void generateBlackList(){
-        try{
-            addBlackList("This file has Black IP");
+    public boolean isBlackIP(InetSocketAddress address) {
+        for (String savedIP : blackList) {
+            if (Objects.isNull(savedIP)) {
+                return false;
+            }
+            if (savedIP.equals(address.getHostName())) {
+                return true;
+            }
         }
-        catch (IOException ignored){
-        }
+        return false;
     }
 
-    private void addBlackList(String IP) throws IOException {
-        PrintWriter printWriter = new PrintWriter(new FileWriter(FILEPATH, true));
-        printWriter.println(IP);
-        printWriter.close();
+    public void addBlackList(InetSocketAddress address) {
+        blackListBuffer.add(address);
+    }
+
+    public void writeBlackList() {
+        if (blackListBuffer.isEmpty()) {
+            return;
+        }
+        Iterator<InetSocketAddress> iterator = blackListBuffer.iterator();
+        try {
+            PrintWriter printWriter = new PrintWriter(new FileWriter(FILEPATH));
+            while (iterator.hasNext()) {
+                printWriter.println(iterator.next().getHostName());
+            }
+            printWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
