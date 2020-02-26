@@ -65,11 +65,10 @@ public class CommandExecutor {
 
     private void op(int srcID, String[] args) {
         if (requests.getClient(srcID).isOp()) {
-            requests.getClient(srcID).setOP(true);
+            requests.getClient(requests.getID(args[1].trim())).setOP(true);
         }
     }
 
-    //TODO 다시짜세요
     private void ignore(int srcID, String[] args) {
         for (int i = 0; ; i++) {
             if (requests.getClient(i) == null) {
@@ -106,6 +105,6 @@ public class CommandExecutor {
         if (!requests.getClient(srcID).isOp()) {
             return;
         }
-        requests.disconnect(requests.getClient(requests.getID(args[1])));
+        requests.disconnect(requests.getClient(requests.getID(args[1].trim())));
     }
 }
