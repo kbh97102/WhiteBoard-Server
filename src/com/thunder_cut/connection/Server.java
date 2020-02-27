@@ -89,6 +89,11 @@ public class Server implements Runnable, Requests {
             if (target.getClient().isConnected()) {
                 target.getClient().close();
                 clients.remove(target);
+                if (clients.size() >= 1){
+                    ByteBuffer buffer = ByteBuffer.wrap("disconnected\n".getBytes());
+                    ReceivedData disconnectMessage = new ReceivedData(DataType.MSG, buffer, 0, target.getName());
+                    requestWriteToClient(disconnectMessage);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -96,11 +101,7 @@ public class Server implements Runnable, Requests {
         for (ConnectedClient client : clients) {
             client.getIgnoreList().clear();
         }
-        if (clients.size() >= 1){
-            ByteBuffer buffer = ByteBuffer.wrap("disconnected".getBytes());
-            ReceivedData test = new ReceivedData(DataType.MSG, buffer, 0, target.getName());
-            requestWriteToClient(test);
-        }
+
     }
 
     @Override
