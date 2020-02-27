@@ -38,6 +38,10 @@ public class DataGenerator {
         return sendingData;
     }
 
+    /**
+     * Make message data with client's name
+     * @return message data
+     */
     private ByteBuffer makeMessageData() {
         String nickName = receivedData.getName().concat("::");
         ByteBuffer sendingData = ByteBuffer.allocate(receivedData.getBuffer().array().length + 10 + nickName.getBytes().length);

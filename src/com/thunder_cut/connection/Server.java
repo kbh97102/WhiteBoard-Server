@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-//클라간의 연결/ 연결해제만
+
 public class Server implements Runnable, Requests {
 
     private final List<ConnectedClient> clients;
@@ -37,6 +37,10 @@ public class Server implements Runnable, Requests {
         clients = Collections.synchronizedList(new ArrayList<>());
     }
 
+    /**
+     * Start accept and start reading data from client
+     * This method keep alive until program is dead
+     */
     @Override
     public void run() {
         while (true) {
@@ -104,6 +108,11 @@ public class Server implements Runnable, Requests {
         }
     }
 
+    /**
+     * Write to all client without ignored client
+     * @param srcID client's index who received data
+     * @param data generated data
+     */
     private synchronized void broadcast(int srcID, ByteBuffer data) {
         ConnectedClient src = clients.get(srcID);
         for (int index = 0; index < clients.size(); index++) {
@@ -122,15 +131,3 @@ public class Server implements Runnable, Requests {
         }
     }
 }
-//함수 이름을 정하기 힘들다 == 기능을 분리해야된다
-//데이터를 전달받아 만들기 + 보내기를 같이 하는 중
-//generator, send 를 나눠야 됨 어떻게?
-//Server Class안에서 또 다른 클래스를 생성하면 종속성이 생김
-//그렇다고 Server를 생성하는 쪽에서 넘겨주면 또 구조가 맘에 안듬 (참고 Dependency Injection)
-
-    /*
-    하나하나 지시하지 말고 요청해라.
-
-예를들어, 판사가 증인에게 1) 목격했던 장면을 떠올리고, 2) 떠오르는 시간을 순서대로 구성하고, 3) 말로 간결하게 표현해라 라고 요청하지 않는다. 그냥 "증언하라" 라고 요청한다.
-마찬가지로 객체의 설계단계에서도 책임이 있는 객체에 요청만 하도록 설계한다.
-     */

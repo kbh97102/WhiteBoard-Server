@@ -34,6 +34,10 @@ public class CommandExecutor {
         commandExecutor.put("/kick", this::kick);
     }
 
+
+    /**
+     * Identify DataType and execute command by given type
+     */
     public void execute() {
         String commandline = new String(receivedData.getBuffer().array());
         String[] args = commandline.split(" ");
