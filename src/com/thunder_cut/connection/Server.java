@@ -87,7 +87,6 @@ public class Server implements Runnable, Requests {
     public void disconnect(ConnectedClient target) {
         try {
             if (target.getClient().isConnected()) {
-                System.out.println(target.getName()+" is disconnected");
                 target.getClient().close();
                 clients.remove(target);
             }
@@ -96,6 +95,11 @@ public class Server implements Runnable, Requests {
         }
         for (ConnectedClient client : clients) {
             client.getIgnoreList().clear();
+        }
+        if (clients.size() >= 1){
+            ByteBuffer buffer = ByteBuffer.wrap("disconnected".getBytes());
+            ReceivedData test = new ReceivedData(DataType.MSG, buffer, 0, target.getName());
+            requestWriteToClient(test);
         }
     }
 
@@ -111,8 +115,9 @@ public class Server implements Runnable, Requests {
 
     /**
      * Write to all client without ignored client
+     *
      * @param srcID client's index who received data
-     * @param data generated data
+     * @param data  generated data
      */
     private synchronized void broadcast(int srcID, ByteBuffer data) {
         ConnectedClient src = clients.get(srcID);
