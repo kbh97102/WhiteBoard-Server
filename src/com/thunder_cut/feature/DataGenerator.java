@@ -9,7 +9,6 @@ import com.thunder_cut.data.DataType;
 import com.thunder_cut.data.ReceivedData;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 
 public class DataGenerator {
 
@@ -20,10 +19,9 @@ public class DataGenerator {
     }
 
     public ByteBuffer generate() {
-        if(receivedData.getDataType() == DataType.IMG){
+        if (receivedData.getDataType() == DataType.IMG) {
             return makeImageData();
-        }
-        else{
+        } else {
             return makeMessageData();
         }
     }
@@ -40,7 +38,7 @@ public class DataGenerator {
         return sendingData;
     }
 
-    private ByteBuffer makeMessageData(){
+    private ByteBuffer makeMessageData() {
         String nickName = receivedData.getName().concat("::");
         ByteBuffer sendingData = ByteBuffer.allocate(receivedData.getBuffer().array().length + 10 + nickName.getBytes().length);
         sendingData.putChar(receivedData.getDataType().type);

@@ -43,9 +43,9 @@ public class Server implements Runnable, Requests {
             try {
                 SocketChannel client = server.accept();
                 InetSocketAddress address = (InetSocketAddress) client.getRemoteAddress();
-                System.out.println(address.getHostName()+" "+address.getPort() + " is connected");
+                System.out.println(address.getHostName() + " " + address.getPort() + " is connected");
                 ConnectedClient connectedClient = new ConnectedClient(client, this);
-                if (clients.size() == 0){
+                if (clients.size() == 0) {
                     connectedClient.setOP(true);
                 }
                 clients.add(connectedClient);
@@ -61,6 +61,7 @@ public class Server implements Runnable, Requests {
         return clients.indexOf(client);
     }
 
+    @Override
     public int getID(String name) {
         for (int index = 0; index < clients.size(); index++) {
             if (clients.get(index).getName().equals(name)) {
@@ -109,8 +110,6 @@ public class Server implements Runnable, Requests {
             if (!src.getIgnoreList().contains(index)) {
                 unicast(index, data);
                 data.flip();
-            }
-            else{
             }
         }
     }

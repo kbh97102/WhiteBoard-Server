@@ -7,7 +7,6 @@ package com.thunder_cut.data;
 
 import java.nio.ByteBuffer;
 
-//읽은 데이터를 받아서 판독 + 생성
 public class ReceivedData {
 
     private ByteBuffer buffer;
@@ -34,7 +33,7 @@ public class ReceivedData {
         return srcID;
     }
 
-    public String getName(){
+    public String getName() {
         return name;
     }
 }
