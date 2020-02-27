@@ -87,6 +87,7 @@ public class Server implements Runnable, Requests {
     public void disconnect(ConnectedClient target) {
         try {
             if (target.getClient().isConnected()) {
+                System.out.println(target.getName()+" is disconnected");
                 target.getClient().close();
                 clients.remove(target);
             }
