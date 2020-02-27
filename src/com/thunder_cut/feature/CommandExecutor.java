@@ -6,6 +6,7 @@
 package com.thunder_cut.feature;
 
 import com.thunder_cut.connection.Requests;
+import com.thunder_cut.data.ConnectedClient;
 import com.thunder_cut.data.ReceivedData;
 
 import java.util.HashMap;
@@ -42,8 +43,9 @@ public class CommandExecutor {
         String commandline = new String(receivedData.getBuffer().array());
         String[] args = commandline.split(" ");
         String commandIdentifier = args[0].trim();
-        if (!Objects.isNull(args[1])) {
+        try {
             commandExecutor.get(commandIdentifier).accept(receivedData.getSrcID(), args);
+        } catch (ArrayIndexOutOfBoundsException e) {
         }
     }
 
@@ -75,14 +77,16 @@ public class CommandExecutor {
     }
 
     private void blind(int srcID, String[] args) {
-        if (requests.getClient(srcID).getIgnoreList().contains(requests.getID(args[1].trim()))) {
-            if (requests.getClient(srcID).getIgnoreList().size() == 1) {
-                requests.getClient(srcID).getIgnoreList().clear();
-            } else {
-                requests.getClient(srcID).getIgnoreList().remove(requests.getID(args[1].trim()));
+        ConnectedClient client = requests.getClient(srcID);
+        if (client.getIgnoreList().contains(srcID)) {
+            client.getIgnoreList().clear();
+            return;
+        }
+        for (int i = 0; ; i++) {
+            if (Objects.isNull(requests.getClient(i))) {
+                return;
             }
-        } else {
-            requests.getClient(srcID).getIgnoreList().add(requests.getID(args[1].trim()));
+            client.getIgnoreList().add(i);
         }
     }
 
