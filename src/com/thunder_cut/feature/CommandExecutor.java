@@ -93,6 +93,13 @@ public class CommandExecutor {
         requests.disconnect(requests.getClient(requests.getID(arg)));
     }
 
+    /*
+    /ban 의 처리
+    또 request? 이게 제일 빠르고 쉬움
+
+
+     */
+
     private void requestWriteCommandMessage(int srcID, String message) {
         ByteBuffer buffer = ByteBuffer.wrap(message.getBytes());
         ReceivedData commandMessage = new ReceivedData(DataType.MSG, buffer, srcID, requests.getClient(srcID).getName());

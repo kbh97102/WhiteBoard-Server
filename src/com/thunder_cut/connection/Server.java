@@ -47,13 +47,15 @@ public class Server implements Runnable, Requests {
             try {
                 SocketChannel client = server.accept();
                 InetSocketAddress address = (InetSocketAddress) client.getRemoteAddress();
-                System.out.println(address.getHostName() + " " + address.getPort() + " is connected");
                 ConnectedClient connectedClient = new ConnectedClient(client, this);
                 if (clients.size() == 0) {
                     connectedClient.setOP(true);
                 }
                 clients.add(connectedClient);
                 connectedClient.startReceiveFromClientToServer();
+
+                String connectMessage = address.getHostName() + " " + address.getPort() + " is connected";
+                writeServerMessage(connectMessage, connectedClient.getName());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -87,10 +89,11 @@ public class Server implements Runnable, Requests {
     public void disconnect(ConnectedClient target) {
         try {
             if (target.getClient().isConnected()) {
+                InetSocketAddress address = (InetSocketAddress)target.getClient().getRemoteAddress();
                 target.getClient().close();
                 clients.remove(target);
                 if (clients.size() >= 1) {
-                    writeDisconnectMessage(target.getName());
+                    writeServerMessage(address.getHostName().concat(" is disconnected"), target.getName());
                 }
             }
         } catch (IOException e) {
@@ -101,10 +104,10 @@ public class Server implements Runnable, Requests {
         }
     }
 
-    private void writeDisconnectMessage(String disconnectedName) {
-        ByteBuffer buffer = ByteBuffer.wrap("disconnected\n".getBytes());
-        ReceivedData disconnectMessage = new ReceivedData(DataType.MSG, buffer, 0, disconnectedName);
-        requestWriteToClient(disconnectMessage);
+    private void writeServerMessage(String message, String name) {
+        ByteBuffer buffer = ByteBuffer.wrap((message.concat("\n")).getBytes());
+        ReceivedData messageData = new ReceivedData(DataType.MSG, buffer, 0, name);
+        requestWriteToClient(messageData);
     }
 
     @Override
