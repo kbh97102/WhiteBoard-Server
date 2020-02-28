@@ -52,7 +52,7 @@ public class CommandExecutor {
     }
 
     private void setName(int srcID, String arg) {
-        requestWriteCommandMessage(srcID, " Changed name -> " + arg);
+        requestWriteCommandMessage(srcID, " Changed name -> " + arg+"\n");
         requests.getClient(srcID).setName(arg);
     }
 
