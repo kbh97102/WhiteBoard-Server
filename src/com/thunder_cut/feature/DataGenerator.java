@@ -40,6 +40,7 @@ public class DataGenerator {
 
     /**
      * Make message data with client's name
+     *
      * @return message data
      */
     private ByteBuffer makeMessageData() {
