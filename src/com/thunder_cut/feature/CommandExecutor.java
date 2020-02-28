@@ -64,20 +64,11 @@ public class CommandExecutor {
     }
 
     private void ignore(int srcID, String[] args) {
-        for (int i = 0; ; i++) {
-            if (requests.getClient(i) == null) {
-                return;
-            }
-            if (requests.getClient(i).getIgnoreList().contains(srcID)) {
-                if (requests.getClient(i).getIgnoreList().size() == 1) {
-                    requests.getClient(i).getIgnoreList().clear();
-                } else {
-                    requests.getClient(i).getIgnoreList().remove(srcID);
-                }
-            } else {
-                requests.getClient(i).getIgnoreList().add(srcID);
-            }
+        if(requests.getClient(requests.getID(args[1].trim())).getIgnoreList().contains(srcID)){
+            requests.getClient(requests.getID(args[1].trim())).getIgnoreList().remove(srcID);
+            return;
         }
+        requests.getClient(requests.getID(args[1].trim())).getIgnoreList().add(srcID);
     }
 
     private void blind(int srcID, String[] args) {
