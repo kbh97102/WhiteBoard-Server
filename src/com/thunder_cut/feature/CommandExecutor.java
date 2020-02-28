@@ -20,7 +20,7 @@ public class CommandExecutor {
 
     private ReceivedData receivedData;
     private Requests requests;
-    private Map<String, BiConsumer<Integer, String[]>> commandExecutor;
+    private Map<String, BiConsumer<Integer, String>> commandExecutor;
 
     public CommandExecutor(ReceivedData receivedData, Requests requests) {
         this.receivedData = receivedData;
@@ -46,32 +46,32 @@ public class CommandExecutor {
         String[] args = commandline.split(" ");
         String commandIdentifier = args[0].trim();
         try {
-            commandExecutor.get(commandIdentifier).accept(receivedData.getSrcID(), args);
+            commandExecutor.get(commandIdentifier).accept(receivedData.getSrcID(), args[1].trim());
         } catch (ArrayIndexOutOfBoundsException e) {
         }
     }
 
-    private void setName(int srcID, String[] args) {
-        requestWriteCommandMessage(srcID, " Changed name -> " + args[1]);
-        requests.getClient(srcID).setName(args[1].trim());
+    private void setName(int srcID, String arg) {
+        requestWriteCommandMessage(srcID, " Changed name -> " + arg);
+        requests.getClient(srcID).setName(arg);
     }
 
-    private void op(int srcID, String[] args) {
+    private void op(int srcID, String arg) {
         if (requests.getClient(srcID).isOp()) {
-            requestWriteCommandMessage(srcID, "Set OP to " + args[1]);
-            requests.getClient(requests.getID(args[1].trim())).setOP(true);
+            requestWriteCommandMessage(srcID, "Set OP to " + arg);
+            requests.getClient(requests.getID(arg)).setOP(true);
         }
     }
 
-    private void ignore(int srcID, String[] args) {
-        if(requests.getClient(requests.getID(args[1].trim())).getIgnoreList().contains(srcID)){
-            requests.getClient(requests.getID(args[1].trim())).getIgnoreList().remove(srcID);
+    private void ignore(int srcID, String arg) {
+        if(requests.getClient(requests.getID(arg)).getIgnoreList().contains(srcID)){
+            requests.getClient(requests.getID(arg)).getIgnoreList().remove(srcID);
             return;
         }
-        requests.getClient(requests.getID(args[1].trim())).getIgnoreList().add(srcID);
+        requests.getClient(requests.getID(arg)).getIgnoreList().add(srcID);
     }
 
-    private void blind(int srcID, String[] args) {
+    private void blind(int srcID, String arg) {
         ConnectedClient client = requests.getClient(srcID);
         if (client.getIgnoreList().contains(srcID)) {
             client.getIgnoreList().clear();
@@ -85,12 +85,12 @@ public class CommandExecutor {
         }
     }
 
-    private void kick(int srcID, String[] args) {
+    private void kick(int srcID, String arg) {
         if (!requests.getClient(srcID).isOp()) {
             return;
         }
-        requestWriteCommandMessage(srcID, "Kick " + args[1]);
-        requests.disconnect(requests.getClient(requests.getID(args[1].trim())));
+        requestWriteCommandMessage(srcID, "Kick " + arg);
+        requests.disconnect(requests.getClient(requests.getID(arg)));
     }
 
     private void requestWriteCommandMessage(int srcID, String message) {
